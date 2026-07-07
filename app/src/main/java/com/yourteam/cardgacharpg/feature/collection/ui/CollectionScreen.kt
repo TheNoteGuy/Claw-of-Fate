@@ -1,9 +1,117 @@
 package com.yourteam.cardgacharpg.feature.collection.ui
 
-// Owner: Person 1 (Leila)
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.yourteam.cardgacharpg.core.model.Card
+import com.yourteam.cardgacharpg.core.model.Element
+import com.yourteam.cardgacharpg.core.model.Rarity
+import com.yourteam.cardgacharpg.core.model.Role
+
+// Owner: Person 1 (Leila) — FA02: Collection-Übersicht mit Filterleiste, Leer-State
 
 @Composable
-fun CollectionScreen() {
-    // TODO: implement UI
+fun CollectionScreen(
+    viewModel: CollectionViewModel = hiltViewModel(),
+    onCardClick: (Card) -> Unit = {}
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        FilterBar(
+            filter = uiState.filter,
+            onElementSelected = viewModel::setElementFilter,
+            onRoleSelected = viewModel::setRoleFilter,
+            onRaritySelected = viewModel::setRarityFilter,
+            onClear = viewModel::clearFilters
+        )
+
+        when {
+            uiState.isLoading -> Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }
+            uiState.isEmpty -> EmptyCollectionHint()
+            else -> LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(uiState.cards, key = { it.id }) { card ->
+                    CardTile(card = card, onClick = { onCardClick(card) })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterBar(
+    filter: CollectionFilterState,
+    onElementSelected: (Element?) -> Unit,
+    onRoleSelected: (Role?) -> Unit,
+    onRaritySelected: (Rarity?) -> Unit,
+    onClear: () -> Unit
+) {
+    Row(Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FilterDropdown("Element", Element.entries, filter.element, { it.name }, onElementSelected)
+        FilterDropdown("Rolle", Role.entries, filter.role, { it.name }, onRoleSelected)
+        FilterDropdown("Seltenheit", Rarity.entries, filter.rarity, { it.name }, onRaritySelected)
+        if (filter.element != null || filter.role != null || filter.rarity != null) {
+            TextButton(onClick = onClear) { Text("Zurücksetzen") }
+        }
+    }
+}
+
+@Composable
+private fun <T> FilterDropdown(
+    label: String,
+    options: List<T>,
+    selected: T?,
+    optionLabel: (T) -> String,
+    onSelected: (T?) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        AssistChip(onClick = { expanded = true }, label = { Text(selected?.let(optionLabel) ?: label) })
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(text = { Text("Alle") }, onClick = { onSelected(null); expanded = false })
+            options.forEach { option ->
+                DropdownMenuItem(text = { Text(optionLabel(option)) }, onClick = { onSelected(option); expanded = false })
+            }
+        }
+    }
+}
+
+// Platzhalter-Kartenvorschau, bis imageAssetName final an ein Bild-Loading angebunden ist
+@Composable
+private fun CardTile(card: Card, onClick: () -> Unit) {
+    ElevatedCard(onClick = onClick, modifier = Modifier.aspectRatio(0.75f)) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(card.name, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+            Text(card.rarity.name, style = MaterialTheme.typography.labelSmall)
+            Text("Lv. ${card.level}", style = MaterialTheme.typography.labelSmall)
+        }
+    }
+}
+
+@Composable
+private fun EmptyCollectionHint() {
+    Box(Modifier.fillMaxSize(), Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Noch keine Karten gesammelt.")
+            Spacer(Modifier.height(8.dp))
+            Text("Gehe zum Gacha, um Helden zu ziehen.", style = MaterialTheme.typography.bodySmall)
+        }
+    }
 }

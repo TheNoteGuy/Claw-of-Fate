@@ -54,6 +54,7 @@ dependencies {
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51")
     ksp("com.google.dagger:hilt-compiler:2.51")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // WorkManager (Person 5 — WeeklyRewardScheduler)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
