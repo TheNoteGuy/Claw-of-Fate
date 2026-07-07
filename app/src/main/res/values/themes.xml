@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Basis-Theme für die Activity. Compose übernimmt das eigentliche Styling
+         via CardGachaRPGTheme; dies hier ist nur der Android-Systemtheme-Anker,
+         den das Manifest braucht (splash background, status bar etc.). -->
+    <style name="Theme.CardGachaRPG" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

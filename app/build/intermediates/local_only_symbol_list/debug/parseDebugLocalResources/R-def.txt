@@ -1,0 +1,11 @@
+R_DEF: Internal format may change without notice
+local
+drawable hero_firecat_common
+drawable hero_firecat_epic
+drawable hero_firecat_rare
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+style Theme.CardGachaRPG
