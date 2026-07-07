@@ -1,9 +1,11 @@
 package com.yourteam.cardgacharpg.feature.collection.ui
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,11 +18,16 @@ import com.yourteam.cardgacharpg.core.model.Rarity
 import com.yourteam.cardgacharpg.core.model.Role
 
 // Owner: Person 1 (Leila) — FA02: Collection-Übersicht mit Filterleiste, Leer-State
+//
+// TEMP (Person 2 / Nico): onOpenGacha + "Gacha"-Button in der Filterleiste, damit man beim
+// Testen ohne fertigen NavGraph vom Collection-Screen zum Gacha springen kann.
+// Kann raus, sobald der echte NavGraph/Navigation-Hub (Person 5) steht.
 
 @Composable
 fun CollectionScreen(
     viewModel: CollectionViewModel = hiltViewModel(),
-    onCardClick: (Card) -> Unit = {}
+    onCardClick: (Card) -> Unit = {},
+    onOpenGacha: () -> Unit = {} // TEMP
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -30,7 +37,8 @@ fun CollectionScreen(
             onElementSelected = viewModel::setElementFilter,
             onRoleSelected = viewModel::setRoleFilter,
             onRaritySelected = viewModel::setRarityFilter,
-            onClear = viewModel::clearFilters
+            onClear = viewModel::clearFilters,
+            onOpenGacha = onOpenGacha // TEMP
         )
 
         when {
@@ -57,12 +65,24 @@ private fun FilterBar(
     onElementSelected: (Element?) -> Unit,
     onRoleSelected: (Role?) -> Unit,
     onRaritySelected: (Rarity?) -> Unit,
-    onClear: () -> Unit
+    onClear: () -> Unit,
+    onOpenGacha: () -> Unit = {} // TEMP
 ) {
-    Row(Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()) // TEMP: verhindert Clipping durch den Extra-Button
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         FilterDropdown("Element", Element.entries, filter.element, { it.name }, onElementSelected)
         FilterDropdown("Rolle", Role.entries, filter.role, { it.name }, onRoleSelected)
         FilterDropdown("Seltenheit", Rarity.entries, filter.rarity, { it.name }, onRaritySelected)
+
+        // TEMP: Sprung zum Gacha zum Testen (raus, sobald echte Navigation existiert)
+        Button(onClick = onOpenGacha) { Text("Gacha ▶") }
+
         if (filter.element != null || filter.role != null || filter.rarity != null) {
             TextButton(onClick = onClear) { Text("Zurücksetzen") }
         }

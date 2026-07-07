@@ -1,6 +1,7 @@
 package com.yourteam.cardgacharpg;
 
 import com.yourteam.cardgacharpg.core.di.DatabaseModule;
+import com.yourteam.cardgacharpg.core.di.RepositoryModule;
 import com.yourteam.cardgacharpg.feature.arena.ui.ArenaViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.arena.ui.HomeViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.battle.ui.BattleViewModel_HiltModules;
@@ -136,7 +137,8 @@ public final class App_HiltComponents {
           ServiceCBuilderModule.class,
           ApplicationContextModule.class,
           DatabaseModule.class,
-          HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class
+          HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
+          RepositoryModule.class
       }
   )
   @Singleton

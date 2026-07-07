@@ -20,6 +20,7 @@ import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_compo
 import hilt_aggregated_deps._com_yourteam_cardgacharpg_App_GeneratedInjector;
 import hilt_aggregated_deps._com_yourteam_cardgacharpg_MainActivity_GeneratedInjector;
 import hilt_aggregated_deps._com_yourteam_cardgacharpg_core_di_DatabaseModule;
+import hilt_aggregated_deps._com_yourteam_cardgacharpg_core_di_RepositoryModule;
 import hilt_aggregated_deps._com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_yourteam_cardgacharpg_feature_arena_ui_HomeViewModel_HiltModules_BindsModule;
@@ -77,6 +78,7 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_yourteam_cardgacharpg_App_GeneratedInjector.class,
         _com_yourteam_cardgacharpg_MainActivity_GeneratedInjector.class,
         _com_yourteam_cardgacharpg_core_di_DatabaseModule.class,
+        _com_yourteam_cardgacharpg_core_di_RepositoryModule.class,
         _com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel_HiltModules_BindsModule.class,
         _com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel_HiltModules_KeyModule.class,
         _com_yourteam_cardgacharpg_feature_arena_ui_HomeViewModel_HiltModules_BindsModule.class,

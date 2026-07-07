@@ -15,6 +15,10 @@ import com.yourteam.cardgacharpg.feature.collection.data.CardDao;
 import com.yourteam.cardgacharpg.feature.collection.data.CardDao_Impl;
 import com.yourteam.cardgacharpg.feature.collection.data.InventoryDao;
 import com.yourteam.cardgacharpg.feature.collection.data.InventoryDao_Impl;
+import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao;
+import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao_Impl;
+import com.yourteam.cardgacharpg.feature.gacha.data.GachaPityDao;
+import com.yourteam.cardgacharpg.feature.gacha.data.GachaPityDao_Impl;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.String;
@@ -34,6 +38,10 @@ public final class AppDatabase_Impl extends AppDatabase {
 
   private volatile InventoryDao _inventoryDao;
 
+  private volatile GachaPityDao _gachaPityDao;
+
+  private volatile CurrencyDao _currencyDao;
+
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
@@ -42,14 +50,18 @@ public final class AppDatabase_Impl extends AppDatabase {
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `cards` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `heroId` INTEGER NOT NULL, `name` TEXT NOT NULL, `rarity` TEXT NOT NULL, `element` TEXT NOT NULL, `role` TEXT NOT NULL, `level` INTEGER NOT NULL, `xp` INTEGER NOT NULL, `baseHp` INTEGER NOT NULL, `baseAtk` INTEGER NOT NULL, `baseDef` INTEGER NOT NULL, `baseSpd` INTEGER NOT NULL, `currentHp` INTEGER NOT NULL, `currentAtk` INTEGER NOT NULL, `currentDef` INTEGER NOT NULL, `currentSpd` INTEGER NOT NULL, `skill1Id` INTEGER NOT NULL, `skill2Id` INTEGER NOT NULL, `imageAssetName` TEXT NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `inventory` (`itemType` TEXT NOT NULL, `amount` INTEGER NOT NULL, PRIMARY KEY(`itemType`))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `gacha_pity` (`id` INTEGER NOT NULL, `pityCount` INTEGER NOT NULL, `lastPullTimestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `currency` (`id` INTEGER NOT NULL, `gems` INTEGER NOT NULL, `gold` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0930d4c4b4c11721a62ac3483e8d8c97')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ecb70d482fa09142854ce4288d0aa9e1')");
       }
 
       @Override
       public void dropAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS `cards`");
         db.execSQL("DROP TABLE IF EXISTS `inventory`");
+        db.execSQL("DROP TABLE IF EXISTS `gacha_pity`");
+        db.execSQL("DROP TABLE IF EXISTS `currency`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -134,9 +146,35 @@ public final class AppDatabase_Impl extends AppDatabase {
                   + " Expected:\n" + _infoInventory + "\n"
                   + " Found:\n" + _existingInventory);
         }
+        final HashMap<String, TableInfo.Column> _columnsGachaPity = new HashMap<String, TableInfo.Column>(3);
+        _columnsGachaPity.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsGachaPity.put("pityCount", new TableInfo.Column("pityCount", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsGachaPity.put("lastPullTimestamp", new TableInfo.Column("lastPullTimestamp", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysGachaPity = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesGachaPity = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoGachaPity = new TableInfo("gacha_pity", _columnsGachaPity, _foreignKeysGachaPity, _indicesGachaPity);
+        final TableInfo _existingGachaPity = TableInfo.read(db, "gacha_pity");
+        if (!_infoGachaPity.equals(_existingGachaPity)) {
+          return new RoomOpenHelper.ValidationResult(false, "gacha_pity(com.yourteam.cardgacharpg.feature.gacha.data.GachaPityEntity).\n"
+                  + " Expected:\n" + _infoGachaPity + "\n"
+                  + " Found:\n" + _existingGachaPity);
+        }
+        final HashMap<String, TableInfo.Column> _columnsCurrency = new HashMap<String, TableInfo.Column>(3);
+        _columnsCurrency.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCurrency.put("gems", new TableInfo.Column("gems", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCurrency.put("gold", new TableInfo.Column("gold", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysCurrency = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesCurrency = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoCurrency = new TableInfo("currency", _columnsCurrency, _foreignKeysCurrency, _indicesCurrency);
+        final TableInfo _existingCurrency = TableInfo.read(db, "currency");
+        if (!_infoCurrency.equals(_existingCurrency)) {
+          return new RoomOpenHelper.ValidationResult(false, "currency(com.yourteam.cardgacharpg.feature.gacha.data.CurrencyEntity).\n"
+                  + " Expected:\n" + _infoCurrency + "\n"
+                  + " Found:\n" + _existingCurrency);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "0930d4c4b4c11721a62ac3483e8d8c97", "6d40f35e9434aef7d1dd0f6829f9fd9f");
+    }, "ecb70d482fa09142854ce4288d0aa9e1", "7ad4e0c78f80a489e5a235038cc9b842");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -147,7 +185,7 @@ public final class AppDatabase_Impl extends AppDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "cards","inventory");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "cards","inventory","gacha_pity","currency");
   }
 
   @Override
@@ -158,6 +196,8 @@ public final class AppDatabase_Impl extends AppDatabase {
       super.beginTransaction();
       _db.execSQL("DELETE FROM `cards`");
       _db.execSQL("DELETE FROM `inventory`");
+      _db.execSQL("DELETE FROM `gacha_pity`");
+      _db.execSQL("DELETE FROM `currency`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -174,6 +214,8 @@ public final class AppDatabase_Impl extends AppDatabase {
     final HashMap<Class<?>, List<Class<?>>> _typeConvertersMap = new HashMap<Class<?>, List<Class<?>>>();
     _typeConvertersMap.put(CardDao.class, CardDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(InventoryDao.class, InventoryDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(GachaPityDao.class, GachaPityDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(CurrencyDao.class, CurrencyDao_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -216,6 +258,34 @@ public final class AppDatabase_Impl extends AppDatabase {
           _inventoryDao = new InventoryDao_Impl(this);
         }
         return _inventoryDao;
+      }
+    }
+  }
+
+  @Override
+  public GachaPityDao gachaPityDao() {
+    if (_gachaPityDao != null) {
+      return _gachaPityDao;
+    } else {
+      synchronized(this) {
+        if(_gachaPityDao == null) {
+          _gachaPityDao = new GachaPityDao_Impl(this);
+        }
+        return _gachaPityDao;
+      }
+    }
+  }
+
+  @Override
+  public CurrencyDao currencyDao() {
+    if (_currencyDao != null) {
+      return _currencyDao;
+    } else {
+      synchronized(this) {
+        if(_currencyDao == null) {
+          _currencyDao = new CurrencyDao_Impl(this);
+        }
+        return _currencyDao;
       }
     }
   }

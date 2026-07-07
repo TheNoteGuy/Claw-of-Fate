@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.yourteam.cardgacharpg.core.database.AppDatabase
 import com.yourteam.cardgacharpg.feature.collection.data.CardDao
 import com.yourteam.cardgacharpg.feature.collection.data.InventoryDao
+import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
+import com.yourteam.cardgacharpg.feature.gacha.data.GachaPityDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,33 +14,26 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-// Hilt module — provides Room DB & DAOs.
-// ⚠ GETEILTE DATEI: Falls P2/P3/P4/P5 eigene DAOs zu AppDatabase hinzufügen,
-// hier jeweils eine passende provide-Funktion ergänzen (siehe Kommentare unten).
+// ⚠ GETEILTE DATEI — bitte im Team abstimmen.
+// Beim Merge war diese Datei leer geworden; ohne sie kann Hilt weder die DB noch irgendein
+// DAO bereitstellen (die ganze App startet dann nicht). Hier wieder vollständig hergestellt.
+// Jede weitere Person hängt ihre DAO-Provider unten an (P3 Formation, P4 Campaign, P5 Arena).
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "cardgacharpg.db"
-        )
-            // .fallbackToDestructiveMigration() // nur für Entwicklung, vor Release entfernen
+    fun provideDatabase(@ApplicationContext ctx: Context): AppDatabase =
+        Room.databaseBuilder(ctx, AppDatabase::class.java, "claw_of_fate.db")
+            .fallbackToDestructiveMigration() // MVP: bei Schema-Änderung DB neu aufbauen
             .build()
 
-    @Provides
-    fun provideCardDao(db: AppDatabase): CardDao = db.cardDao()
+    // --- Person 1 (Karten) ---
+    @Provides fun provideCardDao(db: AppDatabase): CardDao = db.cardDao()
+    @Provides fun provideInventoryDao(db: AppDatabase): InventoryDao = db.inventoryDao()
 
-    @Provides
-    fun provideInventoryDao(db: AppDatabase): InventoryDao = db.inventoryDao()
-
-    // TODO (Person 2): fun provideGachaPityDao(db: AppDatabase): GachaPityDao = db.gachaPityDao()
-    // TODO (Person 2): fun provideCurrencyDao(db: AppDatabase): CurrencyDao = db.currencyDao()
-    // TODO (Person 3): fun provideFormationDao(db: AppDatabase): FormationDao = db.formationDao()
-    // TODO (Person 4): fun provideLevelProgressDao(db: AppDatabase): LevelProgressDao = db.levelProgressDao()
-    // TODO (Person 5): fun provideArenaDao(db: AppDatabase): ArenaDao = db.arenaDao()
+    // --- Person 2 (Gacha/Währung) ---
+    @Provides fun provideGachaPityDao(db: AppDatabase): GachaPityDao = db.gachaPityDao()
+    @Provides fun provideCurrencyDao(db: AppDatabase): CurrencyDao = db.currencyDao()
 }

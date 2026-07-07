@@ -7,6 +7,10 @@ import com.yourteam.cardgacharpg.feature.collection.data.CardDao
 import com.yourteam.cardgacharpg.feature.collection.data.CardEntity
 import com.yourteam.cardgacharpg.feature.collection.data.InventoryDao
 import com.yourteam.cardgacharpg.feature.collection.data.InventoryEntity
+import com.yourteam.cardgacharpg.feature.gacha.data.GachaPityEntity
+import com.yourteam.cardgacharpg.feature.gacha.data.GachaPityDao
+import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyEntity
+import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
 
 // Room DB — referenziert ALLE Entities/DAOs aus jedem Feature
 // ⚠ GETEILTE DATEI: jede Person fügt hier ihre eigenen Entities/DAOs (P2/P3/P4/P5) hinzu.
@@ -21,7 +25,9 @@ import com.yourteam.cardgacharpg.feature.collection.data.InventoryEntity
 @Database(
     entities = [
         CardEntity::class,
-        InventoryEntity::class
+        InventoryEntity::class,
+        GachaPityEntity::class,
+        CurrencyEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -30,4 +36,7 @@ import com.yourteam.cardgacharpg.feature.collection.data.InventoryEntity
 abstract class AppDatabase : RoomDatabase() {
     abstract fun cardDao(): CardDao
     abstract fun inventoryDao(): InventoryDao
+
+    abstract fun gachaPityDao(): GachaPityDao
+    abstract fun currencyDao(): CurrencyDao
 }
