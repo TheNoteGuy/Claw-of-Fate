@@ -1,13 +1,115 @@
 package com.yourteam.cardgacharpg.feature.arena.ui
 
 // Owner: Person 5 (Robin) — Flow.combine() of Card/Currency/LevelProgress/Trophy
+// + Weekly-Reward-Trigger: echter 7-Tage-Zyklus (Button) + Debug-Override (Skip-Cooldown)
+//
+//   FormationDao.get()           — P3, noch leer -> Platzhalter
+//   LevelProgressDao.getAll()    — P4, noch leer -> Platzhalter
+
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
+import com.yourteam.cardgacharpg.feature.arena.domain.TrophyManager
+import com.yourteam.cardgacharpg.feature.arena.domain.WeeklyRewardScheduler
+import com.yourteam.cardgacharpg.feature.collection.data.CardRepository
+import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
+data class HomeUiState(
+    val gems: Int = 0,
+    val gold: Int = 0,
+    val trophies: Int = 0,
+    val cardCount: Int = 0,
+    val activeFormationSize: Int = 0,
+    val campaignStarsTotal: Int = 0,
+    val isLoading: Boolean = true
+)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    // TODO: inject repository
+    private val cardRepository: CardRepository,
+    private val currencyDao: CurrencyDao,
+    private val arenaDao: ArenaDao,
+    private val weeklyRewardScheduler: WeeklyRewardScheduler
 ) : ViewModel() {
 
+    init {
+        viewModelScope.launch { arenaDao.ensureRow() }
+    }
+
+    val uiState: StateFlow<HomeUiState> = combine(
+        cardRepository.getAll(),
+        currencyDao.observeGems(),
+        currencyDao.observeGold(),
+        arenaDao.getProfile()
+    ) { cards, gems, gold, arenaProfile ->
+        HomeUiState(
+            gems = gems ?: 0,
+            gold = gold ?: 0,
+            trophies = arenaProfile?.trophies ?: 0,
+            cardCount = cards.size,
+            activeFormationSize = 0, // TODO: FormationDao (P3)
+            campaignStarsTotal = 0,  // TODO: LevelProgressDao (P4)
+            isLoading = false
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = HomeUiState()
+    )
+
+    // Transiente Snackbar-Nachricht für die Weekly-Reward-Buttons. null = nichts anzeigen.
+    private val _weeklyRewardMessage = MutableStateFlow<String?>(null)
+    val weeklyRewardMessage: StateFlow<String?> = _weeklyRewardMessage.asStateFlow()
+
+    fun claimWeeklyReward() {
+        viewModelScope.launch {
+            val reward = weeklyRewardScheduler.checkAndPayout(force = false)
+            _weeklyRewardMessage.value = if (reward != null) {
+                "+$reward Gems erhalten!"
+            } else {
+                notDueMessage()
+            }
+        }
+    }
+
+    /**
+     * DEBUG/DEMO-Override: überspringt den 7-Tage-Cooldown explizit
+     */
+    fun skipCooldownAndClaim() {
+        viewModelScope.launch {
+            val reward = weeklyRewardScheduler.checkAndPayout(force = true)
+            _weeklyRewardMessage.value = "+$reward Gems erhalten! (Cooldown übersprungen — Debug)"
+        }
+    }
+
+    /** Vom HomeScreen aufrufen, nachdem die Snackbar die Nachricht angezeigt hat. */
+    fun consumeWeeklyRewardMessage() {
+        _weeklyRewardMessage.value = null
+    }
+
+    private suspend fun notDueMessage(): String {
+        val profile = arenaDao.get() ?: return "Kein Arena-Profil gefunden."
+        val elapsed = System.currentTimeMillis() - profile.lastRewardTimestamp
+        val remainingMillis = (WeeklyRewardScheduler.CYCLE_DURATION_MILLIS - elapsed).coerceAtLeast(0)
+        val remainingDays = TimeUnit.MILLISECONDS.toDays(remainingMillis) + 1 // aufrunden
+        return "Noch nicht fällig — verfügbar in ca. $remainingDays Tag(en)."
+    }
+
+    // TODO (Person 5): raus sobald echter Arena-Kampf-Flow existiert (Person 3)
+    fun fakeBattle() {
+        viewModelScope.launch {
+            val won = kotlin.random.Random.nextBoolean()
+            arenaDao.updateTrophies(TrophyManager.deltaFor(won))
+        }
+    }
 }

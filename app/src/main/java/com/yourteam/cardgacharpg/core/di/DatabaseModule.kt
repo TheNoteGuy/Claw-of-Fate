@@ -7,6 +7,7 @@ import com.yourteam.cardgacharpg.feature.collection.data.CardDao
 import com.yourteam.cardgacharpg.feature.collection.data.InventoryDao
 import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
 import com.yourteam.cardgacharpg.feature.gacha.data.GachaPityDao
+import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,4 +37,7 @@ object DatabaseModule {
     // --- Person 2 (Gacha/Währung) ---
     @Provides fun provideGachaPityDao(db: AppDatabase): GachaPityDao = db.gachaPityDao()
     @Provides fun provideCurrencyDao(db: AppDatabase): CurrencyDao = db.currencyDao()
+
+    // --- Person 5 (Arena/Dashboard) ---
+    @Provides fun provideArenaDao(db: AppDatabase): ArenaDao = db.arenaDao()
 }
