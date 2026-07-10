@@ -7,6 +7,7 @@ import com.yourteam.cardgacharpg.feature.arena.ui.HomeViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.battle.ui.BattleViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.battle.ui.FormationViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.campaign.ui.CampaignViewModel_HiltModules;
+import com.yourteam.cardgacharpg.feature.collection.ui.CardDetailViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.collection.ui.CollectionViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.gacha.ui.GachaViewModel_HiltModules;
 import dagger.Binds;
@@ -166,6 +167,7 @@ public final class App_HiltComponents {
           ArenaViewModel_HiltModules.KeyModule.class,
           BattleViewModel_HiltModules.KeyModule.class,
           CampaignViewModel_HiltModules.KeyModule.class,
+          CardDetailViewModel_HiltModules.KeyModule.class,
           CollectionViewModel_HiltModules.KeyModule.class,
           FormationViewModel_HiltModules.KeyModule.class,
           GachaViewModel_HiltModules.KeyModule.class,
@@ -210,6 +212,7 @@ public final class App_HiltComponents {
           ArenaViewModel_HiltModules.BindsModule.class,
           BattleViewModel_HiltModules.BindsModule.class,
           CampaignViewModel_HiltModules.BindsModule.class,
+          CardDetailViewModel_HiltModules.BindsModule.class,
           CollectionViewModel_HiltModules.BindsModule.class,
           FormationViewModel_HiltModules.BindsModule.class,
           GachaViewModel_HiltModules.BindsModule.class,

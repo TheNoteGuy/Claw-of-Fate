@@ -61,7 +61,7 @@ class CatHeroPool : HeroPool {
             // TODO: eigenes Legendary-Asset von Person 1 -> vorerst Epic-Bild als Platzhalter.
             Template(4, "Infernokönig", Element.FEUER, Role.KRIEGER,
                 baseHp = 900, baseAtk = 170, baseDef = 60, baseSpd = 80,
-                skill1Id = 107, skill2Id = 108, imageAssetName = "hero_firecat_epic")
+                skill1Id = 107, skill2Id = 108, imageAssetName = "hero_firecat_legendary")
         )
     )
 
