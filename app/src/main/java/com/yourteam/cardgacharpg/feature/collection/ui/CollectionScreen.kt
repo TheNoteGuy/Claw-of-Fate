@@ -1,5 +1,6 @@
 package com.yourteam.cardgacharpg.feature.collection.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,6 +17,10 @@ import com.yourteam.cardgacharpg.core.model.Card
 import com.yourteam.cardgacharpg.core.model.Element
 import com.yourteam.cardgacharpg.core.model.Rarity
 import com.yourteam.cardgacharpg.core.model.Role
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 
 // Owner: Person 1 (Leila) — FA02: Collection-Übersicht mit Filterleiste, Leer-State
 //
@@ -113,14 +118,27 @@ private fun <T> FilterDropdown(
 @Composable
 private fun CardTile(card: Card, onClick: () -> Unit) {
     ElevatedCard(onClick = onClick, modifier = Modifier.aspectRatio(0.75f)) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(card.name, style = MaterialTheme.typography.labelMedium, maxLines = 1)
-            Text(card.rarity.name, style = MaterialTheme.typography.labelSmall)
-            Text("Lv. ${card.level}", style = MaterialTheme.typography.labelSmall)
+        Box(modifier = Modifier.fillMaxSize()) {
+            CardImage(
+                imageAssetName = card.imageAssetName,
+                contentDescription = card.name,
+                modifier = Modifier.fillMaxSize()
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.65f))
+                        )
+                    )
+                    .padding(8.dp)
+            ) {
+                Text(card.name, style = MaterialTheme.typography.labelMedium, color = Color.White, maxLines = 1)
+                Text(card.rarity.name, style = MaterialTheme.typography.labelSmall, color = Color.White)
+                Text("Lv. ${card.level}", style = MaterialTheme.typography.labelSmall, color = Color.White)
+            }
         }
     }
 }

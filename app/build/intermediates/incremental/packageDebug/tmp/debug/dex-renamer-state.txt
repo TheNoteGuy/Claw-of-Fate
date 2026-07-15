@@ -1,19 +1,19 @@
-#Fri Jul 10 01:20:54 CEST 2026
-base.0=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.10=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\4\\classes.dex
-base.11=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\6\\classes.dex
-base.12=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\7\\classes.dex
-base.13=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\8\\classes.dex
-base.14=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
-base.2=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\10\\classes.dex
-base.3=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\11\\classes.dex
-base.4=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\12\\classes.dex
-base.5=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
-base.6=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
-base.7=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
-base.8=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
-base.9=X\:\\Android Studio Projects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
+#Fri Jul 10 18:15:10 CEST 2026
+base.0=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.10=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\4\\classes.dex
+base.11=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\6\\classes.dex
+base.12=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\7\\classes.dex
+base.13=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\8\\classes.dex
+base.14=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+base.2=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\10\\classes.dex
+base.3=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\11\\classes.dex
+base.4=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\12\\classes.dex
+base.5=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\13\\classes.dex
+base.6=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
+base.7=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\15\\classes.dex
+base.8=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
+base.9=C\:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.10=4/classes.dex
