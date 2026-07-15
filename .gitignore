@@ -1,0 +1,57 @@
+# Build artifacts
+build/
+**/build/
+.gradle/
+gradle-wrapper.jar
+*.apk
+*.aab
+output.json
+
+# IDE - Android Studio / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+*.idev4
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/modules/
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/deploymentTargetDropDown.xml
+captures/
+lint-results.xml
+
+# Kotlin Symbol Processing
+.kotlin/
+kspDebug/
+kspRelease/
+ksp/
+
+# Hilt
+hilt_**/
+
+# Gradle
+.gradle/
+gradle/
+*.lock
+
+# External / Local
+local.properties
+.externalNativeBuild/
+.cxx/
+*.swp
+*~
+.DS_Store
+.classpath
+.project
+.settings
+
+# OS
+Thumbs.db
+
+# Android Studio
+*.log
+proguard-mapping.txt

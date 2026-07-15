@@ -13,6 +13,8 @@ import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyEntity
 import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaProfileEntity
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
+import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressDao
+import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressEntity
 
 // Room DB — referenziert ALLE Entities/DAOs aus jedem Feature
 // ⚠ GETEILTE DATEI: jede Person fügt hier ihre eigenen Entities/DAOs (P2/P3/P4/P5) hinzu.
@@ -31,9 +33,10 @@ import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
         InventoryEntity::class,
         GachaPityEntity::class,
         CurrencyEntity::class,
-        ArenaProfileEntity::class
+        ArenaProfileEntity::class,
+        LevelProgressEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -45,4 +48,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun currencyDao(): CurrencyDao
 
     abstract fun arenaDao(): ArenaDao
+
+    abstract fun levelProgressDao(): LevelProgressDao
 }

@@ -8,6 +8,7 @@ import com.yourteam.cardgacharpg.feature.collection.data.InventoryDao
 import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
 import com.yourteam.cardgacharpg.feature.gacha.data.GachaPityDao
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
+import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,4 +41,7 @@ object DatabaseModule {
 
     // --- Person 5 (Arena/Dashboard) ---
     @Provides fun provideArenaDao(db: AppDatabase): ArenaDao = db.arenaDao()
+
+    // --- Person 4 (Kampagne) ---
+    @Provides fun provideLevelProgressDao(db: AppDatabase): LevelProgressDao = db.levelProgressDao()
 }
