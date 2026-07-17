@@ -48,7 +48,7 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             )
         }
 
-        // TODO (Person 1): cardId-Argument statt "_", sobald CardDetailScreen es annimmt
+
         composable(Routes.COLLECTION) {
             CollectionScreen(
                 onCardClick = { card -> navController.navigate(Routes.cardDetail(card.id)) },

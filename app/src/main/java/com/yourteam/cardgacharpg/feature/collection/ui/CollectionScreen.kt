@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 //
 // TEMP (Person 2 / Nico): onOpenGacha + "Gacha"-Button in der Filterleiste, damit man beim
 // Testen ohne fertigen NavGraph vom Collection-Screen zum Gacha springen kann.
-// Kann raus, sobald der echte NavGraph/Navigation-Hub (Person 5) steht.
 
 @Composable
 fun CollectionScreen(
@@ -42,6 +41,7 @@ fun CollectionScreen(
             onElementSelected = viewModel::setElementFilter,
             onRoleSelected = viewModel::setRoleFilter,
             onRaritySelected = viewModel::setRarityFilter,
+            onLevelBracketSelected = viewModel::setLevelBracketFilter,
             onClear = viewModel::clearFilters,
             onOpenGacha = onOpenGacha // TEMP
         )
@@ -70,6 +70,7 @@ private fun FilterBar(
     onElementSelected: (Element?) -> Unit,
     onRoleSelected: (Role?) -> Unit,
     onRaritySelected: (Rarity?) -> Unit,
+    onLevelBracketSelected: (LevelBracket?) -> Unit,
     onClear: () -> Unit,
     onOpenGacha: () -> Unit = {} // TEMP
 ) {
@@ -84,11 +85,12 @@ private fun FilterBar(
         FilterDropdown("Element", Element.entries, filter.element, { it.name }, onElementSelected)
         FilterDropdown("Rolle", Role.entries, filter.role, { it.name }, onRoleSelected)
         FilterDropdown("Seltenheit", Rarity.entries, filter.rarity, { it.name }, onRaritySelected)
+        FilterDropdown("Level", LevelBracket.entries, filter.levelBracket, { it.displayLabel }, onLevelBracketSelected)
 
         // TEMP: Sprung zum Gacha zum Testen (raus, sobald echte Navigation existiert)
         Button(onClick = onOpenGacha) { Text("Gacha ▶") }
 
-        if (filter.element != null || filter.role != null || filter.rarity != null) {
+        if (filter.element != null || filter.role != null || filter.rarity != null || filter.levelBracket != null) {
             TextButton(onClick = onClear) { Text("Zurücksetzen") }
         }
     }
@@ -123,6 +125,13 @@ private fun CardTile(card: Card, onClick: () -> Unit) {
                 imageAssetName = card.imageAssetName,
                 contentDescription = card.name,
                 modifier = Modifier.fillMaxSize()
+            )
+            // Accessibility: Rarity-Form oben links, nicht nur über Farbverlauf/Text unten erkennbar
+            RarityIndicator(
+                rarity = card.rarity,
+                showLabel = false,
+                dotSize = 16.dp,
+                modifier = Modifier.align(Alignment.TopStart).padding(6.dp)
             )
             Column(
                 modifier = Modifier

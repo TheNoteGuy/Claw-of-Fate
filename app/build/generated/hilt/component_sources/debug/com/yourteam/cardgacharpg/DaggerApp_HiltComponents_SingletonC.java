@@ -13,6 +13,7 @@ import com.yourteam.cardgacharpg.core.di.DatabaseModule_ProvideCurrencyDaoFactor
 import com.yourteam.cardgacharpg.core.di.DatabaseModule_ProvideDatabaseFactory;
 import com.yourteam.cardgacharpg.core.di.DatabaseModule_ProvideGachaPityDaoFactory;
 import com.yourteam.cardgacharpg.core.di.DatabaseModule_ProvideInventoryDaoFactory;
+import com.yourteam.cardgacharpg.core.di.DatabaseModule_ProvideLevelProgressDaoFactory;
 import com.yourteam.cardgacharpg.core.di.RepositoryModule_ProvideHeroPoolFactory;
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao;
 import com.yourteam.cardgacharpg.feature.arena.domain.TrophyManager;
@@ -25,6 +26,10 @@ import com.yourteam.cardgacharpg.feature.battle.ui.BattleViewModel;
 import com.yourteam.cardgacharpg.feature.battle.ui.BattleViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.battle.ui.FormationViewModel;
 import com.yourteam.cardgacharpg.feature.battle.ui.FormationViewModel_HiltModules;
+import com.yourteam.cardgacharpg.feature.campaign.data.CampaignRepository;
+import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressDao;
+import com.yourteam.cardgacharpg.feature.campaign.domain.EnemyFormationProvider;
+import com.yourteam.cardgacharpg.feature.campaign.domain.StarRatingUseCase;
 import com.yourteam.cardgacharpg.feature.campaign.ui.CampaignViewModel;
 import com.yourteam.cardgacharpg.feature.campaign.ui.CampaignViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.collection.data.CardDao;
@@ -420,33 +425,21 @@ public final class DaggerApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_yourteam_cardgacharpg_feature_collection_ui_CollectionViewModel = "com.yourteam.cardgacharpg.feature.collection.ui.CollectionViewModel";
-
-      static String com_yourteam_cardgacharpg_feature_collection_ui_CardDetailViewModel = "com.yourteam.cardgacharpg.feature.collection.ui.CardDetailViewModel";
-
-      static String com_yourteam_cardgacharpg_feature_gacha_ui_GachaViewModel = "com.yourteam.cardgacharpg.feature.gacha.ui.GachaViewModel";
-
-      static String com_yourteam_cardgacharpg_feature_battle_ui_FormationViewModel = "com.yourteam.cardgacharpg.feature.battle.ui.FormationViewModel";
-
       static String com_yourteam_cardgacharpg_feature_battle_ui_BattleViewModel = "com.yourteam.cardgacharpg.feature.battle.ui.BattleViewModel";
 
       static String com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel = "com.yourteam.cardgacharpg.feature.arena.ui.ArenaViewModel";
 
-      static String com_yourteam_cardgacharpg_feature_campaign_ui_CampaignViewModel = "com.yourteam.cardgacharpg.feature.campaign.ui.CampaignViewModel";
+      static String com_yourteam_cardgacharpg_feature_collection_ui_CardDetailViewModel = "com.yourteam.cardgacharpg.feature.collection.ui.CardDetailViewModel";
+
+      static String com_yourteam_cardgacharpg_feature_battle_ui_FormationViewModel = "com.yourteam.cardgacharpg.feature.battle.ui.FormationViewModel";
+
+      static String com_yourteam_cardgacharpg_feature_gacha_ui_GachaViewModel = "com.yourteam.cardgacharpg.feature.gacha.ui.GachaViewModel";
 
       static String com_yourteam_cardgacharpg_feature_arena_ui_HomeViewModel = "com.yourteam.cardgacharpg.feature.arena.ui.HomeViewModel";
 
-      @KeepFieldType
-      CollectionViewModel com_yourteam_cardgacharpg_feature_collection_ui_CollectionViewModel2;
+      static String com_yourteam_cardgacharpg_feature_collection_ui_CollectionViewModel = "com.yourteam.cardgacharpg.feature.collection.ui.CollectionViewModel";
 
-      @KeepFieldType
-      CardDetailViewModel com_yourteam_cardgacharpg_feature_collection_ui_CardDetailViewModel2;
-
-      @KeepFieldType
-      GachaViewModel com_yourteam_cardgacharpg_feature_gacha_ui_GachaViewModel2;
-
-      @KeepFieldType
-      FormationViewModel com_yourteam_cardgacharpg_feature_battle_ui_FormationViewModel2;
+      static String com_yourteam_cardgacharpg_feature_campaign_ui_CampaignViewModel = "com.yourteam.cardgacharpg.feature.campaign.ui.CampaignViewModel";
 
       @KeepFieldType
       BattleViewModel com_yourteam_cardgacharpg_feature_battle_ui_BattleViewModel2;
@@ -455,10 +448,22 @@ public final class DaggerApp_HiltComponents_SingletonC {
       ArenaViewModel com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel2;
 
       @KeepFieldType
-      CampaignViewModel com_yourteam_cardgacharpg_feature_campaign_ui_CampaignViewModel2;
+      CardDetailViewModel com_yourteam_cardgacharpg_feature_collection_ui_CardDetailViewModel2;
+
+      @KeepFieldType
+      FormationViewModel com_yourteam_cardgacharpg_feature_battle_ui_FormationViewModel2;
+
+      @KeepFieldType
+      GachaViewModel com_yourteam_cardgacharpg_feature_gacha_ui_GachaViewModel2;
 
       @KeepFieldType
       HomeViewModel com_yourteam_cardgacharpg_feature_arena_ui_HomeViewModel2;
+
+      @KeepFieldType
+      CollectionViewModel com_yourteam_cardgacharpg_feature_collection_ui_CollectionViewModel2;
+
+      @KeepFieldType
+      CampaignViewModel com_yourteam_cardgacharpg_feature_campaign_ui_CampaignViewModel2;
     }
   }
 
@@ -509,6 +514,10 @@ public final class DaggerApp_HiltComponents_SingletonC {
       return new CurrencyManager(singletonCImpl.provideDatabaseProvider.get(), singletonCImpl.currencyDao());
     }
 
+    private CampaignRepository campaignRepository() {
+      return new CampaignRepository(singletonCImpl.levelProgressDao(), new EnemyFormationProvider());
+    }
+
     private LevelUpUseCase levelUpUseCase() {
       return new LevelUpUseCase(cardRepository(), singletonCImpl.inventoryDao());
     }
@@ -542,45 +551,45 @@ public final class DaggerApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_yourteam_cardgacharpg_feature_collection_ui_CardDetailViewModel = "com.yourteam.cardgacharpg.feature.collection.ui.CardDetailViewModel";
+      static String com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel = "com.yourteam.cardgacharpg.feature.arena.ui.ArenaViewModel";
 
       static String com_yourteam_cardgacharpg_feature_collection_ui_CollectionViewModel = "com.yourteam.cardgacharpg.feature.collection.ui.CollectionViewModel";
 
-      static String com_yourteam_cardgacharpg_feature_arena_ui_HomeViewModel = "com.yourteam.cardgacharpg.feature.arena.ui.HomeViewModel";
-
-      static String com_yourteam_cardgacharpg_feature_battle_ui_FormationViewModel = "com.yourteam.cardgacharpg.feature.battle.ui.FormationViewModel";
+      static String com_yourteam_cardgacharpg_feature_collection_ui_CardDetailViewModel = "com.yourteam.cardgacharpg.feature.collection.ui.CardDetailViewModel";
 
       static String com_yourteam_cardgacharpg_feature_battle_ui_BattleViewModel = "com.yourteam.cardgacharpg.feature.battle.ui.BattleViewModel";
 
+      static String com_yourteam_cardgacharpg_feature_battle_ui_FormationViewModel = "com.yourteam.cardgacharpg.feature.battle.ui.FormationViewModel";
+
       static String com_yourteam_cardgacharpg_feature_gacha_ui_GachaViewModel = "com.yourteam.cardgacharpg.feature.gacha.ui.GachaViewModel";
+
+      static String com_yourteam_cardgacharpg_feature_arena_ui_HomeViewModel = "com.yourteam.cardgacharpg.feature.arena.ui.HomeViewModel";
 
       static String com_yourteam_cardgacharpg_feature_campaign_ui_CampaignViewModel = "com.yourteam.cardgacharpg.feature.campaign.ui.CampaignViewModel";
 
-      static String com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel = "com.yourteam.cardgacharpg.feature.arena.ui.ArenaViewModel";
-
       @KeepFieldType
-      CardDetailViewModel com_yourteam_cardgacharpg_feature_collection_ui_CardDetailViewModel2;
+      ArenaViewModel com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel2;
 
       @KeepFieldType
       CollectionViewModel com_yourteam_cardgacharpg_feature_collection_ui_CollectionViewModel2;
 
       @KeepFieldType
-      HomeViewModel com_yourteam_cardgacharpg_feature_arena_ui_HomeViewModel2;
-
-      @KeepFieldType
-      FormationViewModel com_yourteam_cardgacharpg_feature_battle_ui_FormationViewModel2;
+      CardDetailViewModel com_yourteam_cardgacharpg_feature_collection_ui_CardDetailViewModel2;
 
       @KeepFieldType
       BattleViewModel com_yourteam_cardgacharpg_feature_battle_ui_BattleViewModel2;
 
       @KeepFieldType
+      FormationViewModel com_yourteam_cardgacharpg_feature_battle_ui_FormationViewModel2;
+
+      @KeepFieldType
       GachaViewModel com_yourteam_cardgacharpg_feature_gacha_ui_GachaViewModel2;
 
       @KeepFieldType
-      CampaignViewModel com_yourteam_cardgacharpg_feature_campaign_ui_CampaignViewModel2;
+      HomeViewModel com_yourteam_cardgacharpg_feature_arena_ui_HomeViewModel2;
 
       @KeepFieldType
-      ArenaViewModel com_yourteam_cardgacharpg_feature_arena_ui_ArenaViewModel2;
+      CampaignViewModel com_yourteam_cardgacharpg_feature_campaign_ui_CampaignViewModel2;
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -611,7 +620,7 @@ public final class DaggerApp_HiltComponents_SingletonC {
           return (T) new BattleViewModel();
 
           case 2: // com.yourteam.cardgacharpg.feature.campaign.ui.CampaignViewModel 
-          return (T) new CampaignViewModel();
+          return (T) new CampaignViewModel(viewModelCImpl.campaignRepository(), new StarRatingUseCase());
 
           case 3: // com.yourteam.cardgacharpg.feature.collection.ui.CardDetailViewModel 
           return (T) new CardDetailViewModel(viewModelCImpl.savedStateHandle, viewModelCImpl.cardRepository(), singletonCImpl.inventoryDao(), viewModelCImpl.levelUpUseCase());
@@ -726,6 +735,10 @@ public final class DaggerApp_HiltComponents_SingletonC {
 
     private CurrencyDao currencyDao() {
       return DatabaseModule_ProvideCurrencyDaoFactory.provideCurrencyDao(provideDatabaseProvider.get());
+    }
+
+    private LevelProgressDao levelProgressDao() {
+      return DatabaseModule_ProvideLevelProgressDaoFactory.provideLevelProgressDao(provideDatabaseProvider.get());
     }
 
     private InventoryDao inventoryDao() {

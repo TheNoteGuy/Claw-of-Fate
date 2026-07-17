@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yourteam.cardgacharpg.core.model.Card
+import com.yourteam.cardgacharpg.feature.collection.domain.SkillCatalog
 
 // Owner: Person 1 (Leila) — FA09: Detailansicht (Stats, Fähigkeiten, Level) mit Einstieg
 // in den Level-Up-Flow (FA06, siehe LevelUpSheet.kt)
@@ -118,14 +120,18 @@ fun CardDetailScreen(
 
                     Spacer(Modifier.height(16.dp))
                     Text(card.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    Text(
-                        "${card.rarity.name} · Lv. ${card.level}/${card.rarity.maxLevel}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RarityIndicator(rarity = card.rarity, showLabel = false)
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            "${card.rarity.name} · Lv. ${card.level}/${card.rarity.maxLevel}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
 
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        AssistChip(onClick = {}, label = { Text(card.element.name) })
+                        ElementChip(element = card.element)
                         AssistChip(onClick = {}, label = { Text(card.role.name) })
                     }
 
@@ -135,13 +141,10 @@ fun CardDetailScreen(
                     Spacer(Modifier.height(24.dp))
                     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                         Text("Fähigkeiten", style = MaterialTheme.typography.titleMedium)
-                        Spacer(Modifier.height(4.dp))
-                        // TODO: sobald ein Skill-Modell existiert, hier Name/Beschreibung
-                        // statt der rohen Skill-ID anzeigen.
-                        Text(
-                            "Skill #${card.skill1Id}   ·   Skill #${card.skill2Id}",
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Spacer(Modifier.height(8.dp))
+                        SkillRow(skill = SkillCatalog.get(card.skill1Id))
+                        Spacer(Modifier.height(8.dp))
+                        SkillRow(skill = SkillCatalog.get(card.skill2Id))
                     }
 
                     Spacer(Modifier.height(32.dp))
@@ -193,5 +196,12 @@ private fun StatRow(label: String, value: Int) {
     ) {
         Text(label, style = MaterialTheme.typography.bodyMedium)
         Text(value.toString(), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+    }
+}
+@Composable
+private fun SkillRow(skill: com.yourteam.cardgacharpg.core.model.Skill) {
+    Column(Modifier.fillMaxWidth()) {
+        Text(skill.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+        Text(skill.description, style = MaterialTheme.typography.bodySmall)
     }
 }

@@ -15,12 +15,23 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-// Owner: Person 1 (Leila) — FA02: filterbare Collection (Element, Rolle, Seltenheit) + Sortierung
+// Owner: Person 1 (Leila) — FA02: filterbare Collection (Element, Rolle, Seltenheit, Level) + Sortierung
+
+// Level-Filter als grobe Buckets statt Einzelwert — GDD verlangt einen "Level"-Filter, ein exakter
+// Wert wäre bei Levelspannen 1-50 kaum nutzbar. Buckets decken alle Rarity-Maxlevels ab (bis 50).
+enum class LevelBracket(val displayLabel: String, val range: IntRange) {
+    LVL_1_10("1–10", 1..10),
+    LVL_11_20("11–20", 11..20),
+    LVL_21_30("21–30", 21..30),
+    LVL_31_40("31–40", 31..40),
+    LVL_41_50("41–50", 41..50)
+}
 
 data class CollectionFilterState(
     val element: Element? = null,
     val role: Role? = null,
-    val rarity: Rarity? = null
+    val rarity: Rarity? = null,
+    val levelBracket: LevelBracket? = null
 )
 
 enum class CollectionSortOrder { LEVEL_DESC, RARITY_DESC }
@@ -50,7 +61,8 @@ class CollectionViewModel @Inject constructor(
         val filtered = cards.filter { card ->
             (filter.element == null || card.element == filter.element) &&
                     (filter.role == null || card.role == filter.role) &&
-                    (filter.rarity == null || card.rarity == filter.rarity)
+                    (filter.rarity == null || card.rarity == filter.rarity) &&
+                    (filter.levelBracket == null || card.level in filter.levelBracket.range)
         }
         val sorted = when (sortOrder) {
             CollectionSortOrder.LEVEL_DESC ->
@@ -68,6 +80,7 @@ class CollectionViewModel @Inject constructor(
     fun setElementFilter(element: Element?) { filterState.value = filterState.value.copy(element = element) }
     fun setRoleFilter(role: Role?) { filterState.value = filterState.value.copy(role = role) }
     fun setRarityFilter(rarity: Rarity?) { filterState.value = filterState.value.copy(rarity = rarity) }
+    fun setLevelBracketFilter(bracket: LevelBracket?) { filterState.value = filterState.value.copy(levelBracket = bracket) }
     fun clearFilters() { filterState.value = CollectionFilterState() }
     fun setSortOrder(order: CollectionSortOrder) { sortOrderState.value = order }
 }
