@@ -1,10 +1,12 @@
 package com.yourteam.cardgacharpg.feature.battle.ui;
 
+import com.yourteam.cardgacharpg.feature.battle.data.FormationRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;
 import dagger.internal.ScopeMetadata;
 import javax.annotation.processing.Generated;
+import javax.inject.Provider;
 
 @ScopeMetadata
 @QualifierMetadata
@@ -21,20 +23,23 @@ import javax.annotation.processing.Generated;
     "cast"
 })
 public final class BattleViewModel_Factory implements Factory<BattleViewModel> {
+  private final Provider<FormationRepository> formationRepositoryProvider;
+
+  public BattleViewModel_Factory(Provider<FormationRepository> formationRepositoryProvider) {
+    this.formationRepositoryProvider = formationRepositoryProvider;
+  }
+
   @Override
   public BattleViewModel get() {
-    return newInstance();
+    return newInstance(formationRepositoryProvider.get());
   }
 
-  public static BattleViewModel_Factory create() {
-    return InstanceHolder.INSTANCE;
+  public static BattleViewModel_Factory create(
+      Provider<FormationRepository> formationRepositoryProvider) {
+    return new BattleViewModel_Factory(formationRepositoryProvider);
   }
 
-  public static BattleViewModel newInstance() {
-    return new BattleViewModel();
-  }
-
-  private static final class InstanceHolder {
-    private static final BattleViewModel_Factory INSTANCE = new BattleViewModel_Factory();
+  public static BattleViewModel newInstance(FormationRepository formationRepository) {
+    return new BattleViewModel(formationRepository);
   }
 }

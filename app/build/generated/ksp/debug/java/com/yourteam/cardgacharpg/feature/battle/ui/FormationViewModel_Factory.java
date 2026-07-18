@@ -1,10 +1,13 @@
 package com.yourteam.cardgacharpg.feature.battle.ui;
 
+import com.yourteam.cardgacharpg.feature.battle.data.FormationRepository;
+import com.yourteam.cardgacharpg.feature.collection.data.CardRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;
 import dagger.internal.ScopeMetadata;
 import javax.annotation.processing.Generated;
+import javax.inject.Provider;
 
 @ScopeMetadata
 @QualifierMetadata
@@ -21,20 +24,29 @@ import javax.annotation.processing.Generated;
     "cast"
 })
 public final class FormationViewModel_Factory implements Factory<FormationViewModel> {
+  private final Provider<FormationRepository> formationRepositoryProvider;
+
+  private final Provider<CardRepository> cardRepositoryProvider;
+
+  public FormationViewModel_Factory(Provider<FormationRepository> formationRepositoryProvider,
+      Provider<CardRepository> cardRepositoryProvider) {
+    this.formationRepositoryProvider = formationRepositoryProvider;
+    this.cardRepositoryProvider = cardRepositoryProvider;
+  }
+
   @Override
   public FormationViewModel get() {
-    return newInstance();
+    return newInstance(formationRepositoryProvider.get(), cardRepositoryProvider.get());
   }
 
-  public static FormationViewModel_Factory create() {
-    return InstanceHolder.INSTANCE;
+  public static FormationViewModel_Factory create(
+      Provider<FormationRepository> formationRepositoryProvider,
+      Provider<CardRepository> cardRepositoryProvider) {
+    return new FormationViewModel_Factory(formationRepositoryProvider, cardRepositoryProvider);
   }
 
-  public static FormationViewModel newInstance() {
-    return new FormationViewModel();
-  }
-
-  private static final class InstanceHolder {
-    private static final FormationViewModel_Factory INSTANCE = new FormationViewModel_Factory();
+  public static FormationViewModel newInstance(FormationRepository formationRepository,
+      CardRepository cardRepository) {
+    return new FormationViewModel(formationRepository, cardRepository);
   }
 }

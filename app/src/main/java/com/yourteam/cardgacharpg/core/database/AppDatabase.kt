@@ -15,18 +15,18 @@ import com.yourteam.cardgacharpg.feature.arena.data.ArenaProfileEntity
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
 import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressDao
 import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressEntity
+import com.yourteam.cardgacharpg.feature.battle.data.FormationEntity
+import com.yourteam.cardgacharpg.feature.battle.data.FormationDao
 
 // Room DB — referenziert ALLE Entities/DAOs aus jedem Feature
 // ⚠ GETEILTE DATEI: jede Person fügt hier ihre eigenen Entities/DAOs (P2/P3/P4/P5) hinzu.
 // Vor dem Mergen kurz im Team abstimmen (Merge-Konflikte + version bump koordinieren).
 //
 // Aktuell enthalten: Person 1 (Card, Inventory)
+//                    Person 2 (GachaPity, Currency)
+//                    Person 3 (Formation) — NEU
+//                    Person 4 (LevelProgress)
 //                    Person 5 (ArenaProfileEntity, ArenaDao)
-
-
-// TODO (Person 2): GachaPityEntity, CurrencyDao/-Entity o.ä.
-// TODO (Person 3): FormationEntity, FormationDao
-// TODO (Person 4): LevelProgressEntity, EnemyFormationEntity, LevelProgressDao
 @Database(
     entities = [
         CardEntity::class,
@@ -34,9 +34,10 @@ import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressEntity
         GachaPityEntity::class,
         CurrencyEntity::class,
         ArenaProfileEntity::class,
-        LevelProgressEntity::class
+        LevelProgressEntity::class,
+        FormationEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -50,4 +51,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun arenaDao(): ArenaDao
 
     abstract fun levelProgressDao(): LevelProgressDao
+
+    abstract fun formationDao(): FormationDao
 }

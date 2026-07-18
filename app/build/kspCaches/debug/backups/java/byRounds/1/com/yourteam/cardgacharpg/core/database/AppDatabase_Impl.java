@@ -13,6 +13,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao;
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao_Impl;
+import com.yourteam.cardgacharpg.feature.battle.data.FormationDao;
+import com.yourteam.cardgacharpg.feature.battle.data.FormationDao_Impl;
 import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressDao;
 import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressDao_Impl;
 import com.yourteam.cardgacharpg.feature.collection.data.CardDao;
@@ -50,10 +52,12 @@ public final class AppDatabase_Impl extends AppDatabase {
 
   private volatile LevelProgressDao _levelProgressDao;
 
+  private volatile FormationDao _formationDao;
+
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(3) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(4) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `cards` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `heroId` INTEGER NOT NULL, `name` TEXT NOT NULL, `rarity` TEXT NOT NULL, `element` TEXT NOT NULL, `role` TEXT NOT NULL, `level` INTEGER NOT NULL, `xp` INTEGER NOT NULL, `baseHp` INTEGER NOT NULL, `baseAtk` INTEGER NOT NULL, `baseDef` INTEGER NOT NULL, `baseSpd` INTEGER NOT NULL, `currentHp` INTEGER NOT NULL, `currentAtk` INTEGER NOT NULL, `currentDef` INTEGER NOT NULL, `currentSpd` INTEGER NOT NULL, `skill1Id` INTEGER NOT NULL, `skill2Id` INTEGER NOT NULL, `imageAssetName` TEXT NOT NULL)");
@@ -62,8 +66,9 @@ public final class AppDatabase_Impl extends AppDatabase {
         db.execSQL("CREATE TABLE IF NOT EXISTS `currency` (`id` INTEGER NOT NULL, `gems` INTEGER NOT NULL, `gold` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `arena_profile` (`id` INTEGER NOT NULL, `trophies` INTEGER NOT NULL, `weeklyArenaCount` INTEGER NOT NULL, `lastRewardTimestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `level_progress` (`levelId` INTEGER NOT NULL, `isUnlocked` INTEGER NOT NULL, `stars` INTEGER NOT NULL, PRIMARY KEY(`levelId`))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `formation` (`id` INTEGER NOT NULL, `slot0` INTEGER, `slot1` INTEGER, `slot2` INTEGER, `slot3` INTEGER, `slot4` INTEGER, `slot5` INTEGER, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '93f38d39075253aba54ba64042a48b75')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bd74989a9db6f87b9872c592211c29f9')");
       }
 
       @Override
@@ -74,6 +79,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         db.execSQL("DROP TABLE IF EXISTS `currency`");
         db.execSQL("DROP TABLE IF EXISTS `arena_profile`");
         db.execSQL("DROP TABLE IF EXISTS `level_progress`");
+        db.execSQL("DROP TABLE IF EXISTS `formation`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -211,9 +217,26 @@ public final class AppDatabase_Impl extends AppDatabase {
                   + " Expected:\n" + _infoLevelProgress + "\n"
                   + " Found:\n" + _existingLevelProgress);
         }
+        final HashMap<String, TableInfo.Column> _columnsFormation = new HashMap<String, TableInfo.Column>(7);
+        _columnsFormation.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsFormation.put("slot0", new TableInfo.Column("slot0", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsFormation.put("slot1", new TableInfo.Column("slot1", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsFormation.put("slot2", new TableInfo.Column("slot2", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsFormation.put("slot3", new TableInfo.Column("slot3", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsFormation.put("slot4", new TableInfo.Column("slot4", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsFormation.put("slot5", new TableInfo.Column("slot5", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysFormation = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesFormation = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoFormation = new TableInfo("formation", _columnsFormation, _foreignKeysFormation, _indicesFormation);
+        final TableInfo _existingFormation = TableInfo.read(db, "formation");
+        if (!_infoFormation.equals(_existingFormation)) {
+          return new RoomOpenHelper.ValidationResult(false, "formation(com.yourteam.cardgacharpg.feature.battle.data.FormationEntity).\n"
+                  + " Expected:\n" + _infoFormation + "\n"
+                  + " Found:\n" + _existingFormation);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "93f38d39075253aba54ba64042a48b75", "8792bb6a542cf833b26e735337c78e14");
+    }, "bd74989a9db6f87b9872c592211c29f9", "c97219dc74fc5915b70da69c4990cb5e");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -224,7 +247,7 @@ public final class AppDatabase_Impl extends AppDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "cards","inventory","gacha_pity","currency","arena_profile","level_progress");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "cards","inventory","gacha_pity","currency","arena_profile","level_progress","formation");
   }
 
   @Override
@@ -239,6 +262,7 @@ public final class AppDatabase_Impl extends AppDatabase {
       _db.execSQL("DELETE FROM `currency`");
       _db.execSQL("DELETE FROM `arena_profile`");
       _db.execSQL("DELETE FROM `level_progress`");
+      _db.execSQL("DELETE FROM `formation`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -259,6 +283,7 @@ public final class AppDatabase_Impl extends AppDatabase {
     _typeConvertersMap.put(CurrencyDao.class, CurrencyDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(ArenaDao.class, ArenaDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(LevelProgressDao.class, LevelProgressDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(FormationDao.class, FormationDao_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -357,6 +382,20 @@ public final class AppDatabase_Impl extends AppDatabase {
           _levelProgressDao = new LevelProgressDao_Impl(this);
         }
         return _levelProgressDao;
+      }
+    }
+  }
+
+  @Override
+  public FormationDao formationDao() {
+    if (_formationDao != null) {
+      return _formationDao;
+    } else {
+      synchronized(this) {
+        if(_formationDao == null) {
+          _formationDao = new FormationDao_Impl(this);
+        }
+        return _formationDao;
       }
     }
   }
