@@ -13,6 +13,10 @@ import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyEntity
 import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaProfileEntity
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
+import com.yourteam.cardgacharpg.feature.battle.data.ActiveFormationEntity
+import com.yourteam.cardgacharpg.feature.battle.data.FormationCardPlacementEntity
+import com.yourteam.cardgacharpg.feature.battle.data.FormationDao
+import com.yourteam.cardgacharpg.feature.battle.data.FormationEntity
 import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressDao
 import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressEntity
 
@@ -34,7 +38,9 @@ import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressEntity
         GachaPityEntity::class,
         CurrencyEntity::class,
         ArenaProfileEntity::class,
-        LevelProgressEntity::class
+        LevelProgressEntity::class,
+        FormationEntity::class,
+        ActiveFormationEntity::class
     ],
     version = 3,
     exportSchema = false
@@ -50,4 +56,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun arenaDao(): ArenaDao
 
     abstract fun levelProgressDao(): LevelProgressDao
+
+    abstract fun formationDao(): FormationDao
 }

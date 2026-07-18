@@ -38,6 +38,7 @@ fun CollectionScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         FilterBar(
             filter = uiState.filter,
+            isEmbedded = true,
             onElementSelected = viewModel::setElementFilter,
             onRoleSelected = viewModel::setRoleFilter,
             onRaritySelected = viewModel::setRarityFilter,
@@ -65,8 +66,9 @@ fun CollectionScreen(
 }
 
 @Composable
-private fun FilterBar(
+fun FilterBar(
     filter: CollectionFilterState,
+    isEmbedded: Boolean,
     onElementSelected: (Element?) -> Unit,
     onRoleSelected: (Role?) -> Unit,
     onRaritySelected: (Rarity?) -> Unit,
@@ -88,7 +90,8 @@ private fun FilterBar(
         FilterDropdown("Level", LevelBracket.entries, filter.levelBracket, { it.displayLabel }, onLevelBracketSelected)
 
         // TEMP: Sprung zum Gacha zum Testen (raus, sobald echte Navigation existiert)
-        Button(onClick = onOpenGacha) { Text("Gacha ▶") }
+        if (!isEmbedded)
+            Button(onClick = onOpenGacha) { Text("Gacha ▶") }
 
         if (filter.element != null || filter.role != null || filter.rarity != null || filter.levelBracket != null) {
             TextButton(onClick = onClear) { Text("Zurücksetzen") }
@@ -118,9 +121,9 @@ private fun <T> FilterDropdown(
 
 // Platzhalter-Kartenvorschau, bis imageAssetName final an ein Bild-Loading angebunden ist
 @Composable
-private fun CardTile(card: Card, onClick: () -> Unit) {
+fun CardTile(modifier: Modifier = Modifier, card: Card, onClick: () -> Unit) {
     ElevatedCard(onClick = onClick, modifier = Modifier.aspectRatio(0.75f)) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = modifier.fillMaxSize()) {
             CardImage(
                 imageAssetName = card.imageAssetName,
                 contentDescription = card.name,
@@ -153,7 +156,7 @@ private fun CardTile(card: Card, onClick: () -> Unit) {
 }
 
 @Composable
-private fun EmptyCollectionHint() {
+fun EmptyCollectionHint() {
     Box(Modifier.fillMaxSize(), Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Noch keine Karten gesammelt.")

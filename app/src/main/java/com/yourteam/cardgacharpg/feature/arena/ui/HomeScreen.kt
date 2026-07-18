@@ -157,7 +157,7 @@ private fun FormationPreviewCard(activeFormationSize: Int, cardCount: Int, onCli
                 style = MaterialTheme.typography.bodySmall
             )
             TextButton(onClick = onClick, modifier = Modifier.align(Alignment.End)) {
-                Text("Formation bearbeiten")
+                Text("Formationen bearbeiten")
             }
         }
     }

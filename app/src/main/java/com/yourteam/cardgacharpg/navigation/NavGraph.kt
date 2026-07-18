@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.yourteam.cardgacharpg.feature.arena.ui.ArenaScreen
 import com.yourteam.cardgacharpg.feature.arena.ui.HomeScreen
 import com.yourteam.cardgacharpg.feature.battle.ui.FormationEditorScreen
+import com.yourteam.cardgacharpg.feature.battle.ui.FormationOverviewScreen
 import com.yourteam.cardgacharpg.feature.campaign.ui.CampaignMapScreen
 import com.yourteam.cardgacharpg.feature.campaign.ui.PveBattleResultScreen
 import com.yourteam.cardgacharpg.feature.collection.ui.CardDetailScreen
@@ -27,6 +28,9 @@ object Routes {
     fun cardDetail(cardId: Int) = "card_detail/$cardId"
     const val GACHA = "gacha"
     const val FORMATION = "formation"
+    const val FORMATION_EDITOR_ARG = "formationId"
+    const val FORMATION_EDITOR = "formation_editor/{$FORMATION_EDITOR_ARG}"
+    fun editFormation(formationId: Long) = "formation_editor/${formationId}"
     const val CAMPAIGN = "campaign"
     const val BATTLE_RESULT = "battle_result/{levelId}/{isVictory}/{stars}"
     const val ARENA = "arena"
@@ -68,7 +72,19 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         }
 
         composable(Routes.FORMATION) {
-            FormationEditorScreen()
+            FormationOverviewScreen(
+                onBack = { navController.popBackStack() },
+                onOpenFormationEditor = { formation -> navController.navigate(Routes.editFormation(formation)) },
+            )
+        }
+
+        composable(
+            route = Routes.FORMATION_EDITOR,
+            arguments = listOf(navArgument(Routes.FORMATION_EDITOR_ARG) { type = NavType.LongType })
+        ) {
+            FormationEditorScreen(
+                onBack = { navController.popBackStack() },
+            )
         }
 
         composable(Routes.CAMPAIGN) {
