@@ -131,7 +131,7 @@ fun BattlePlaybackContent(
 
     Column(modifier = modifier) {
         // --- Gegner-Formation (hinten oben, vorne Richtung Mitte) ---
-        Text(enemyLabel, style = MaterialTheme.typography.labelLarge)
+        Text(enemyLabel, style = MaterialTheme.typography.labelLarge, color = Color.White)
         Spacer(Modifier.height(4.dp))
         FormationRows(
             units = log.enemyUnits,
@@ -143,7 +143,7 @@ fun BattlePlaybackContent(
         Spacer(Modifier.height(10.dp))
 
         // --- Spieler-Formation (vorne oben Richtung Mitte, hinten unten) ---
-        Text(playerLabel, style = MaterialTheme.typography.labelLarge)
+        Text(playerLabel, style = MaterialTheme.typography.labelLarge, color = Color.White)
         Spacer(Modifier.height(4.dp))
         FormationRows(
             units = log.playerUnits,
@@ -160,7 +160,7 @@ fun BattlePlaybackContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Kampfverlauf", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Text("Kampfverlauf", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color.White)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = { speed = if (speed == 1) 2 else 1 }) { Text("${speed}\u00D7") }
                 if (!finished) {
@@ -230,7 +230,7 @@ private fun UnitTile(unit: BattleParticipant, currentHp: Int, modifier: Modifier
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(Color(0xFF1E2636))
             .alpha(if (alive) 1f else 0.4f)
             .padding(6.dp)
     ) {
@@ -238,13 +238,14 @@ private fun UnitTile(unit: BattleParticipant, currentHp: Int, modifier: Modifier
             text = unit.name,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
+            color = Color.White,
             maxLines = 1
         )
         Spacer(Modifier.height(3.dp))
         LinearProgressIndicator(
             progress = { hpFraction },
             color = barColor,
-            trackColor = MaterialTheme.colorScheme.surface,
+            trackColor = Color.Black.copy(alpha = 0.4f),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(6.dp)
@@ -254,6 +255,7 @@ private fun UnitTile(unit: BattleParticipant, currentHp: Int, modifier: Modifier
         Text(
             text = if (alive) "$currentHp / ${unit.maxHp}" else "K.O.",
             style = MaterialTheme.typography.labelSmall,
+            color = Color.White.copy(alpha = 0.85f),
             textAlign = TextAlign.End,
             modifier = Modifier.fillMaxWidth()
         )
@@ -289,6 +291,7 @@ private fun BattleLogBox(
                     text = "— Runde ${step.roundNumber} —",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
+                    color = Color(0xFFFFC107),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -319,5 +322,10 @@ private fun ActionLine(action: ActionEvent, targetIsAlly: Boolean) {
             "$sidePrefix ${action.actorName} greift ${action.targetName} an: ${action.amount} Schaden" +
                     if (action.targetDefeated) " (besiegt!)" else ""
     }
-    Text(text, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 1.dp))
+    Text(
+        text,
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.White.copy(alpha = 0.9f),
+        modifier = Modifier.padding(vertical = 1.dp)
+    )
 }

@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -43,10 +44,14 @@ fun BattleResultScreen(
             Text(
                 if (isVictory) "SIEG!" else "NIEDERLAGE",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = if (isVictory) Color(0xFFFFC107) else Color.White
             )
             Spacer(Modifier.height(8.dp))
-            Text("$playerSurvivors von $playerTotalUnits Helden überlebt")
+            Text(
+                "$playerSurvivors von $playerTotalUnits Helden überlebt",
+                color = Color.White.copy(alpha = 0.85f)
+            )
             Spacer(Modifier.height(32.dp))
             Button(onClick = onContinue, modifier = Modifier.fillMaxWidth()) {
                 Text("Weiter")

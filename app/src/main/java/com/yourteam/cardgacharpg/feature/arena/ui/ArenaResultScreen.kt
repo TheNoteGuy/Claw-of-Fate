@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -30,27 +31,31 @@ fun ArenaResultScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            if (result.won) "Sieg!" else "Niederlage",
+            if (result.won) "Sieg! 🏆" else "Niederlage",
             style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = if (result.won) Color(0xFFFFC107) else Color.White
         )
         Spacer(Modifier.height(12.dp))
         Text(
             "${if (result.trophyDelta >= 0) "+" else ""}${result.trophyDelta} 🏆",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
+            color = Color.White
         )
         if (result.playerTotalUnits > 0) {
             Spacer(Modifier.height(4.dp))
             Text(
                 "${result.playerSurvivors} von ${result.playerTotalUnits} Helden überlebt",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.85f)
             )
         }
         if (result.goldReward > 0) {
             Spacer(Modifier.height(4.dp))
             Text(
                 "+${result.goldReward} 🪙",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = Color(0xFFFFC107)
             )
         }
         Spacer(Modifier.height(32.dp))

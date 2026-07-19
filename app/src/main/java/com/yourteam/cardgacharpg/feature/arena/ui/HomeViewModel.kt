@@ -11,7 +11,8 @@ import androidx.lifecycle.viewModelScope
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
 import com.yourteam.cardgacharpg.feature.arena.domain.TrophyManager
 import com.yourteam.cardgacharpg.feature.arena.domain.WeeklyRewardScheduler
-import com.yourteam.cardgacharpg.feature.battle.data.FormationDao
+import com.yourteam.cardgacharpg.core.model.Card
+import com.yourteam.cardgacharpg.feature.battle.data.FormationRepository
 import com.yourteam.cardgacharpg.feature.campaign.data.CampaignRepository
 import com.yourteam.cardgacharpg.feature.collection.data.CardRepository
 import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
@@ -32,8 +33,9 @@ data class HomeUiState(
     val trophies: Int = 0,
     val cardCount: Int = 0,
     val activeFormationSize: Int = 0,
-    // true = Slot belegt; Index 0-2 = vordere Reihe, 3-5 = hintere Reihe (FA03)
-    val formationSlots: List<Boolean> = List(6) { false },
+    // ⚠ Typ geaendert (UI-Polish): jetzt die echten Karten je Slot (null = leer), damit der
+    // HomeScreen die Katzen-Icons anzeigen kann. Index 0-2 = vordere Reihe, 3-5 = hintere (FA03).
+    val formationSlots: List<Card?> = List(6) { null },
     val campaignStarsTotal: Int = 0,
     val campaignMaxStars: Int = 30, // 10 Level x 3 Sterne
     val isLoading: Boolean = true
@@ -44,7 +46,7 @@ class HomeViewModel @Inject constructor(
     private val cardRepository: CardRepository,
     private val currencyDao: CurrencyDao,
     private val arenaDao: ArenaDao,
-    private val formationDao: FormationDao,
+    formationRepository: FormationRepository,
     campaignRepository: CampaignRepository,
     private val weeklyRewardScheduler: WeeklyRewardScheduler
 ) : ViewModel() {
@@ -55,10 +57,12 @@ class HomeViewModel @Inject constructor(
 
     // combine() nimmt max. 5 Flows mit benannten Parametern — Formation + Kampagne
     // werden deshalb zuerst zu einem Pair gebuendelt und dann aussen dazukombiniert.
+    // FormationRepository.activeFormation loest die Slot-IDs bereits zu Card-Objekten auf
+    // (Person 3, Public Contract) — genau das, was die Formations-Vorschau braucht.
     private val progressFlow = combine(
-        formationDao.observe(),
+        formationRepository.activeFormation,
         campaignRepository.getAllLevelProgress()
-    ) { formation, levels -> formation to levels }
+    ) { slots, levels -> slots to levels }
 
     val uiState: StateFlow<HomeUiState> = combine(
         cardRepository.getAll(),
@@ -67,18 +71,14 @@ class HomeViewModel @Inject constructor(
         arenaDao.getProfile(),
         progressFlow
     ) { cards, gems, gold, arenaProfile, progress ->
-        val (formation, levels) = progress
-        val slots = listOf(
-            formation?.slot0, formation?.slot1, formation?.slot2,
-            formation?.slot3, formation?.slot4, formation?.slot5
-        )
+        val (slots, levels) = progress
         HomeUiState(
             gems = gems ?: 0,
             gold = gold ?: 0,
             trophies = arenaProfile?.trophies ?: 0,
             cardCount = cards.size,
             activeFormationSize = slots.count { it != null },
-            formationSlots = slots.map { it != null },
+            formationSlots = slots,
             campaignStarsTotal = levels.sumOf { it.stars },
             isLoading = false
         )

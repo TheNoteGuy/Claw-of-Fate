@@ -20,7 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yourteam.cardgacharpg.BuildConfig
+import com.yourteam.cardgacharpg.core.model.Card
 import com.yourteam.cardgacharpg.feature.arena.domain.TrophyManager
+import com.yourteam.cardgacharpg.feature.collection.ui.CardImage
+import com.yourteam.cardgacharpg.feature.gacha.ui.color
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 
 // UI-Polish (Abgabe-Sprint) — Wald-Look zum Setting "Der Dunkle Wald":
 // dunkelgruener Vertikal-Verlauf als Hintergrund, halbtransparente gruene Karten,
@@ -225,7 +231,7 @@ private fun CampaignProgressCard(starsTotal: Int, maxStars: Int, modifier: Modif
 
 @Composable
 private fun FormationPreviewCard(
-    formationSlots: List<Boolean>,
+    formationSlots: List<Card?>,
     activeFormationSize: Int,
     cardCount: Int,
     onClick: () -> Unit
@@ -264,28 +270,43 @@ private fun FormationPreviewCard(
 }
 
 @Composable
-private fun FormationRow(slots: List<Boolean>, indices: List<Int>) {
+private fun FormationRow(slots: List<Card?>, indices: List<Int>) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         indices.forEach { index ->
             FormationSlot(
-                filled = slots.getOrElse(index) { false },
+                card = slots.getOrNull(index),
                 modifier = Modifier.weight(1f)
             )
         }
     }
 }
 
+// UI-Polish: zeigt das Katzen-Icon der platzierten Karte (mit Rarity-Rahmen) statt
+// nur eines gefuellten Kaestchens — man sieht auf einen Blick, WER in der Formation steht.
 @Composable
-private fun FormationSlot(filled: Boolean, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.height(32.dp),
-        tonalElevation = if (filled) 4.dp else 0.dp,
-        color = if (filled) Color(0xFF3E7C4A) else Color.White.copy(alpha = 0.08f)
-    ) {
-        if (filled) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(text = "⚔", style = MaterialTheme.typography.labelMedium)
-            }
+private fun FormationSlot(card: Card?, modifier: Modifier = Modifier) {
+    if (card != null) {
+        Box(
+            modifier = modifier
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(8.dp))
+                .border(1.5.dp, card.rarity.color(), RoundedCornerShape(8.dp))
+        ) {
+            CardImage(
+                imageAssetName = card.imageAssetName,
+                contentDescription = card.name,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    } else {
+        Box(
+            modifier = modifier
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.White.copy(alpha = 0.08f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "+", style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.4f))
         }
     }
 }

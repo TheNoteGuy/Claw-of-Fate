@@ -3,6 +3,7 @@ package com.yourteam.cardgacharpg.feature.arena.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yourteam.cardgacharpg.core.model.BattleFormationInput
+import com.yourteam.cardgacharpg.core.model.BattleLog
 import com.yourteam.cardgacharpg.core.model.BattleSide
 import com.yourteam.cardgacharpg.core.model.Card
 import com.yourteam.cardgacharpg.core.model.Position
@@ -56,7 +57,9 @@ data class ArenaBattleResult(
     val trophyDelta: Int,
     val goldReward: Int = 0,
     val playerSurvivors: Int = 0,
-    val playerTotalUnits: Int = 0
+    val playerTotalUnits: Int = 0,
+    // Kompletter Kampf-Log fuer das Playback im ArenaScreen (BattlePlaybackContent, Person 3).
+    val log: BattleLog? = null
 )
 
 @HiltViewModel
@@ -143,7 +146,8 @@ class ArenaViewModel @Inject constructor(
                         trophyDelta = delta,
                         goldReward = goldReward,
                         playerSurvivors = log.playerSurvivors,
-                        playerTotalUnits = log.playerTotalUnits
+                        playerTotalUnits = log.playerTotalUnits,
+                        log = log
                     )
                 )
             }

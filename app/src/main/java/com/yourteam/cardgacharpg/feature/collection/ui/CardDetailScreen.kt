@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +31,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,12 +41,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yourteam.cardgacharpg.core.model.Card
 import com.yourteam.cardgacharpg.feature.collection.domain.SkillCatalog
+import com.yourteam.cardgacharpg.feature.gacha.ui.color
 
 // Owner: Person 1 (Leila) — FA09: Detailansicht (Stats, Fähigkeiten, Level) mit Einstieg
 // in den Level-Up-Flow (FA06, siehe LevelUpSheet.kt)
@@ -78,18 +84,29 @@ fun CardDetailScreen(
         }
     }
 
+    // UI-Polish: dunkler Verlauf im Blauton der Collection + Rarity-Akzente,
+    // TopAppBar transparent (kein heller Balken mehr oben).
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text(state.card?.name ?: "Kartendetail") },
+                title = { Text(state.card?.name ?: "Kartendetail", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = Modifier.background(
+            Brush.verticalGradient(listOf(Color(0xFF0E1B2E), Color(0xFF060B14)))
+        )
     ) { padding ->
         val card = state.card
 
@@ -98,7 +115,7 @@ fun CardDetailScreen(
                 CircularProgressIndicator()
             }
             card == null -> Box(Modifier.fillMaxSize().padding(padding), Alignment.Center) {
-                Text("Karte nicht gefunden.")
+                Text("Karte nicht gefunden.", color = Color.White)
             }
             else -> {
                 Column(
@@ -116,16 +133,19 @@ fun CardDetailScreen(
                             .fillMaxWidth(0.6f)
                             .aspectRatio(0.75f)
                             .clip(RoundedCornerShape(16.dp))
+                            // Rarity-Rahmen wie im Collection-Grid — konsistente Farbsprache
+                            .border(2.dp, card.rarity.color(), RoundedCornerShape(16.dp))
                     )
 
                     Spacer(Modifier.height(16.dp))
-                    Text(card.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text(card.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RarityIndicator(rarity = card.rarity, showLabel = false)
                         Spacer(Modifier.width(6.dp))
                         Text(
                             "${card.rarity.name} · Lv. ${card.level}/${card.rarity.maxLevel}",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.85f)
                         )
                     }
 
@@ -140,7 +160,7 @@ fun CardDetailScreen(
 
                     Spacer(Modifier.height(24.dp))
                     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-                        Text("Fähigkeiten", style = MaterialTheme.typography.titleMedium)
+                        Text("Fähigkeiten", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
                         Spacer(Modifier.height(8.dp))
                         SkillRow(skill = SkillCatalog.get(card.skill1Id))
                         Spacer(Modifier.height(8.dp))
@@ -151,9 +171,18 @@ fun CardDetailScreen(
                     Button(
                         onClick = { showLevelUpSheet = true },
                         enabled = !state.isMaxLevel,
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFC107),
+                            contentColor = Color(0xFF3A2A00),
+                            disabledContainerColor = Color(0xFFFFC107).copy(alpha = 0.35f),
+                            disabledContentColor = Color(0xFF3A2A00).copy(alpha = 0.6f)
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(if (state.isMaxLevel) "Maximallevel erreicht" else "Level Up  (🧪 ${state.potionsAvailable})")
+                        Text(
+                            if (state.isMaxLevel) "Maximallevel erreicht" else "⬆ Level Up  (🧪 ${state.potionsAvailable})",
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
@@ -178,7 +207,10 @@ fun CardDetailScreen(
 
 @Composable
 private fun StatsCard(card: Card) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = androidx.compose.material3.CardDefaults.elevatedCardColors(containerColor = Color(0xFF121E30))
+    ) {
         Column(Modifier.padding(16.dp)) {
             StatRow("HP", card.currentHp)
             StatRow("ATK", card.currentAtk)
@@ -194,14 +226,14 @@ private fun StatRow(label: String, value: Int) {
         Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium)
-        Text(value.toString(), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.75f))
+        Text(value.toString(), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
     }
 }
 @Composable
 private fun SkillRow(skill: com.yourteam.cardgacharpg.core.model.Skill) {
     Column(Modifier.fillMaxWidth()) {
-        Text(skill.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-        Text(skill.description, style = MaterialTheme.typography.bodySmall)
+        Text(skill.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
+        Text(skill.description, style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.75f))
     }
 }

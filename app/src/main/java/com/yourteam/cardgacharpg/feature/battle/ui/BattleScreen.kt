@@ -14,10 +14,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.background
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,8 +41,22 @@ fun BattleScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // UI-Polish: "Kampf bei Fackelschein" — dunkler Rot/Schiefer-Verlauf fuer alle
+    // Kampf-Screens (gleiches Design im Kampagnen-Kampf, CampaignBattleScreen).
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Testkampf") }) }
+        containerColor = Color.Transparent,
+        topBar = {
+            TopAppBar(
+                title = { Text("⚔ Testkampf", fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = Color.White
+                )
+            )
+        },
+        modifier = Modifier.background(
+            Brush.verticalGradient(listOf(Color(0xFF2B1A1A), Color(0xFF0F0909)))
+        )
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
             when {

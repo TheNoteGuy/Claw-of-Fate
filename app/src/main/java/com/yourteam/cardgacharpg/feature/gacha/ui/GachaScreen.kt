@@ -144,11 +144,16 @@ fun GachaScreen(
 
             Spacer(Modifier.weight(1f))
 
-            // Pull-Buttons (deaktiviert, wenn zu wenig Gems oder gerade ein Pull läuft).
+            // Pull-Buttons. UI-Polish: Bei zu wenig Gems werden die Buttons nur noch LEICHT
+            // abgedunkelt (vorher fast unlesbar hart ausgegraut) und ein Hinweis erklaert,
+            // wie viele Gems fehlen — der Wunsch bleibt sichtbar, nur der Klick ist gesperrt.
             OutlinedButton(
                 onClick = viewModel::onSinglePull,
                 enabled = state.canSinglePull,
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color.White,
+                    disabledContentColor = Color.White.copy(alpha = 0.55f)
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Single-Pull  (${GachaEngine.SINGLE_PULL_COST} 💎)")
@@ -161,13 +166,36 @@ fun GachaScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = GachaGold,
                     contentColor = Color(0xFF3A2A00),
-                    disabledContainerColor = GachaGold.copy(alpha = 0.3f)
+                    disabledContainerColor = GachaGold.copy(alpha = 0.55f),
+                    disabledContentColor = Color(0xFF3A2A00).copy(alpha = 0.75f)
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     "✨ 10er-Pull  (${GachaEngine.TEN_PULL_COST} 💎) ✨",
                     fontWeight = FontWeight.Bold
+                )
+            }
+
+            // Fehlende-Gems-Hinweis statt stummem Ausgrauen
+            if (!state.isPulling && state.gems < GachaEngine.SINGLE_PULL_COST) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Dir fehlen ${GachaEngine.SINGLE_PULL_COST - state.gems} 💎 für einen Pull — " +
+                            "Gems gibt's als Kampagnen-Belohnung und im Weekly Reward!",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = GachaGold.copy(alpha = 0.9f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else if (!state.isPulling && state.gems < GachaEngine.TEN_PULL_COST) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Noch ${GachaEngine.TEN_PULL_COST - state.gems} 💎 bis zum 10er-Pull (100 💎 Rabatt!)",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.6f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
