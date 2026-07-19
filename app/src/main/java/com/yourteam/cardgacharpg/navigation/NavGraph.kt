@@ -87,7 +87,8 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
 
         composable(Routes.FORMATION) {
             FormationEditorScreen(
-                onStartTestBattle = { navController.navigate(Routes.BATTLE) }
+                onStartTestBattle = { navController.navigate(Routes.BATTLE) },
+                onBack = { navController.popBackStack() }
             )
         }
 
