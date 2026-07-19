@@ -19,8 +19,7 @@ class MainActivity : ComponentActivity() {
         // Edge-to-Edge: App zeichnet ihren eigenen Hintergrund bis unter Status-/Navigationsleiste,
         // statt dass das System dort die Default-Fensterfarbe (weißer Balken!) zeigt.
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT)
+
         )
 
         setContent {
