@@ -326,31 +326,38 @@ private fun NavigationHub(
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
-        // Farbcodierung passend zu den Ziel-Screens: Collection = Blau, Gacha = Violett,
-        // Kampagne = Waldgruen, Arena = Hauptaktion
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = onOpenCollection,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C4A7C)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2C4A7C),
+                    contentColor = Color.White          // NEU: sonst dunkelbraune onPrimary-Schrift (schlecht lesbar)
+                ),
                 modifier = Modifier.weight(1f)
-            ) { Text("📚 Collection") }
+            ) { Text("📚 Collection", fontWeight = FontWeight.Bold) }
             Button(
                 onClick = onOpenGacha,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7B2CBF)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF7B2CBF),
+                    contentColor = Color.White          // NEU
+                ),
                 modifier = Modifier.weight(1f)
-            ) { Text("✨ Gacha") }
+            ) { Text("✨ Gacha", fontWeight = FontWeight.Bold) }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = onOpenCampaign,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3E7C4A)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF3E7C4A),
+                    contentColor = Color.White          // NEU
+                ),
                 modifier = Modifier.weight(1f)
-            ) { Text("🗺 Kampagne") }
+            ) { Text("🗺 Kampagne", fontWeight = FontWeight.Bold) }
             Button(
                 onClick = onOpenArena,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = StarGold,
-                    contentColor = Color(0xFF3A2A00)
+                    contentColor = Color(0xFF3A2A00)     // unverändert: dunkler Text auf Gold ist bereits gut lesbar
                 ),
                 modifier = Modifier.weight(1f)
             ) { Text("⚔ Arena", fontWeight = FontWeight.Bold) }
