@@ -27,6 +27,10 @@ fun PveBattleResultScreen(
     isVictory: Boolean,
     starsEarned: Int,
     levelId: Int,
+    // Belohnungen aus CompleteCampaignLevelUseCase (0 = nichts anzeigen, z.B. bei Niederlage)
+    goldReward: Int = 0,
+    gemReward: Int = 0,
+    xpPotionReward: Int = 0,
     onContinue: () -> Unit
 ) {
     val backgroundColor = if (isVictory) Color(0xFF1B2612) else Color(0xFF261212)
@@ -117,7 +121,27 @@ fun PveBattleResultScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(64.dp))
+            // Belohnungs-Anzeige: was der Sieg konkret eingebracht hat (inkl. XP-Traenke,
+            // damit der Spieler die neue Leveling-Ressource auch SIEHT — FA06-Zufluss)
+            if (isVictory && (goldReward > 0 || gemReward > 0 || xpPotionReward > 0)) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Surface(
+                    color = Color.Black.copy(alpha = 0.35f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (goldReward > 0) RewardItem(icon = "🪙", amount = goldReward, label = "Gold")
+                        if (gemReward > 0) RewardItem(icon = "💎", amount = gemReward, label = "Gems")
+                        if (xpPotionReward > 0) RewardItem(icon = "🧪", amount = xpPotionReward, label = "XP-Tränke")
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(48.dp))
 
             Button(
                 onClick = onContinue,
@@ -140,6 +164,20 @@ fun PveBattleResultScreen(
     }
 }
 
+@Composable
+private fun RewardItem(icon: String, amount: Int, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = icon, fontSize = 22.sp)
+        Text(
+            text = "+$amount",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = Color.LightGray)
+    }
+}
+
 @Preview
 @Composable
 private fun VictoryPreview() {
@@ -148,6 +186,9 @@ private fun VictoryPreview() {
             isVictory = true,
             starsEarned = 3,
             levelId = 1,
+            goldReward = 55,
+            gemReward = 50,
+            xpPotionReward = 2,
             onContinue = {}
         )
     }

@@ -33,39 +33,39 @@
 20-->[androidx.core:core:1.13.0] C:\Users\user\.gradle\caches\9.0.0\transforms\71544ca30f24bf45aae6638bcdd316e3\transformed\core-1.13.0\AndroidManifest.xml:26:22-94
 21
 22    <application
-22-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:4:5-21:19
+22-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:4:5-21:19
 23        android:name="com.yourteam.cardgacharpg.App"
-23-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:5:9-28
+23-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:5:9-28
 24        android:allowBackup="true"
-24-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:6:9-35
+24-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:6:9-35
 25        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
 25-->[androidx.core:core:1.13.0] C:\Users\user\.gradle\caches\9.0.0\transforms\71544ca30f24bf45aae6638bcdd316e3\transformed\core-1.13.0\AndroidManifest.xml:28:18-86
 26        android:debuggable="true"
 27        android:extractNativeLibs="false"
 28        android:icon="@mipmap/ic_launcher"
-28-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:7:9-43
+28-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:7:9-43
 29        android:label="Claw of Fate"
-29-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:8:9-37
+29-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:8:9-37
 30        android:testOnly="true"
 31        android:theme="@style/Theme.CardGachaRPG" >
-31-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:9:9-50
+31-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:9:9-50
 32        <activity
-32-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:11:9-19:20
+32-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:11:9-19:20
 33            android:name="com.yourteam.cardgacharpg.MainActivity"
-33-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:12:13-41
+33-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:12:13-41
 34            android:exported="true"
-34-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:13:13-36
+34-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:13:13-36
 35            android:theme="@style/Theme.CardGachaRPG" >
-35-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:14:13-54
+35-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:14:13-54
 36            <intent-filter>
-36-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:15:13-18:29
+36-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:15:13-18:29
 37                <action android:name="android.intent.action.MAIN" />
-37-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:16:17-69
-37-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:16:25-66
+37-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:16:17-69
+37-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:16:25-66
 38
 39                <category android:name="android.intent.category.LAUNCHER" />
-39-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:17:17-77
-39-->C:\Users\user\StudioProjects\Claw-of-Fate\app\src\main\AndroidManifest.xml:17:27-74
+39-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:17:17-77
+39-->C:\Users\user\StudioProjects\Claw-of-Fate_Abgabe_Version\app\src\main\AndroidManifest.xml:17:27-74
 40            </intent-filter>
 41        </activity>
 42        <activity

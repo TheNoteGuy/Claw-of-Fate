@@ -20,6 +20,7 @@ import com.yourteam.cardgacharpg.feature.arena.ui.HomeScreen
 import com.yourteam.cardgacharpg.feature.battle.ui.BattleResultScreen
 import com.yourteam.cardgacharpg.feature.battle.ui.BattleScreen
 import com.yourteam.cardgacharpg.feature.battle.ui.FormationEditorScreen
+import com.yourteam.cardgacharpg.feature.campaign.ui.CampaignBattleScreen
 import com.yourteam.cardgacharpg.feature.campaign.ui.CampaignMapScreen
 import com.yourteam.cardgacharpg.feature.campaign.ui.PveBattleResultScreen
 import com.yourteam.cardgacharpg.feature.collection.ui.CardDetailScreen
@@ -37,7 +38,14 @@ object Routes {
     const val FORMATION = "formation"
     const val BATTLE = "battle" // NEU (Person 3): Testkampf aus dem Formations-Editor
     const val CAMPAIGN = "campaign"
-    const val BATTLE_RESULT = "battle_result/{levelId}/{isVictory}/{stars}"
+    // NEU: echter Kampagnen-Kampf (Person 3+4). levelId als Nav-Argument.
+    const val CAMPAIGN_BATTLE = "campaign_battle/{levelId}"
+    fun campaignBattle(levelId: Int) = "campaign_battle/$levelId"
+    // ⚠ ERWEITERT: Route enthaelt jetzt zusaetzlich die Belohnungen (gold/gems/potions),
+    // damit der Result-Screen sie anzeigen kann, ohne den State erneut laden zu muessen.
+    const val BATTLE_RESULT = "battle_result/{levelId}/{isVictory}/{stars}/{gold}/{gems}/{potions}"
+    fun battleResult(levelId: Int, isVictory: Boolean, stars: Int, gold: Int, gems: Int, potions: Int) =
+        "battle_result/$levelId/$isVictory/$stars/$gold/$gems/$potions"
     const val ARENA = "arena"
 }
 
@@ -105,7 +113,40 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         }
 
         composable(Routes.CAMPAIGN) {
-            CampaignMapScreen(onBack = { navController.popBackStack() })
+            CampaignMapScreen(
+                onBack = { navController.popBackStack() },
+                onStartBattle = { levelId ->
+                    navController.navigate(Routes.campaignBattle(levelId))
+                }
+            )
+        }
+
+        // NEU: Kampagnen-Kampf — simuliert den Kampf gegen die Level-Gegner,
+        // schreibt Sterne/Freischaltung/Belohnungen (CompleteCampaignLevelUseCase)
+        // und leitet danach zum Ergebnis-Screen weiter.
+        composable(
+            route = Routes.CAMPAIGN_BATTLE,
+            arguments = listOf(navArgument("levelId") { type = NavType.IntType })
+        ) {
+            CampaignBattleScreen(
+                onBack = { navController.popBackStack() },
+                onFinished = { outcome ->
+                    navController.navigate(
+                        Routes.battleResult(
+                            levelId = outcome.levelId,
+                            isVictory = outcome.isVictory,
+                            stars = outcome.starsEarned,
+                            gold = outcome.rewards.gold,
+                            gems = outcome.rewards.gems,
+                            potions = outcome.rewards.xpPotions
+                        )
+                    ) {
+                        // Kampf-Screen vom Backstack entfernen: Zurueck vom Ergebnis
+                        // fuehrt direkt zur Kampagnen-Karte, nicht erneut in den Kampf.
+                        popUpTo(Routes.CAMPAIGN) { inclusive = false }
+                    }
+                }
+            )
         }
 
         composable(
@@ -113,17 +154,24 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
             arguments = listOf(
                 navArgument("levelId") { type = NavType.IntType },
                 navArgument("isVictory") { type = NavType.BoolType },
-                navArgument("stars") { type = NavType.IntType }
+                navArgument("stars") { type = NavType.IntType },
+                navArgument("gold") { type = NavType.IntType },
+                navArgument("gems") { type = NavType.IntType },
+                navArgument("potions") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            val levelId = backStackEntry.arguments?.getInt("levelId") ?: 0
-            val isVictory = backStackEntry.arguments?.getBoolean("isVictory") ?: false
-            val stars = backStackEntry.arguments?.getInt("stars") ?: 0
+            val args = backStackEntry.arguments
+            val levelId = args?.getInt("levelId") ?: 0
+            val isVictory = args?.getBoolean("isVictory") ?: false
+            val stars = args?.getInt("stars") ?: 0
 
             PveBattleResultScreen(
                 isVictory = isVictory,
                 starsEarned = stars,
                 levelId = levelId,
+                goldReward = args?.getInt("gold") ?: 0,
+                gemReward = args?.getInt("gems") ?: 0,
+                xpPotionReward = args?.getInt("potions") ?: 0,
                 onContinue = {
                     navController.popBackStack(Routes.CAMPAIGN, inclusive = false)
                 }

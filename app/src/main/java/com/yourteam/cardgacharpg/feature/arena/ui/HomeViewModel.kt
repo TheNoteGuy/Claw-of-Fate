@@ -1,16 +1,18 @@
 package com.yourteam.cardgacharpg.feature.arena.ui
 
-// Owner: Person 5 (Robin) — Flow.combine() of Card/Currency/LevelProgress/Trophy
+// Owner: Person 5 (Robin) — Flow.combine() of Card/Currency/LevelProgress/Trophy/Formation
 // + Weekly-Reward-Trigger: echter 7-Tage-Zyklus (Button) + Debug-Override (Skip-Cooldown)
 //
-//   FormationDao.get()           — P3, noch leer -> Platzhalter
-//   LevelProgressDao.getAll()    — P4, noch leer -> Platzhalter
+// ERLEDIGT: FormationDao (P3) + CampaignRepository (P4) sind jetzt angebunden —
+// activeFormationSize und campaignStarsTotal kommen aus echten Daten.
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yourteam.cardgacharpg.feature.arena.data.ArenaDao
 import com.yourteam.cardgacharpg.feature.arena.domain.TrophyManager
 import com.yourteam.cardgacharpg.feature.arena.domain.WeeklyRewardScheduler
+import com.yourteam.cardgacharpg.feature.battle.data.FormationDao
+import com.yourteam.cardgacharpg.feature.campaign.data.CampaignRepository
 import com.yourteam.cardgacharpg.feature.collection.data.CardRepository
 import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyDao
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +32,10 @@ data class HomeUiState(
     val trophies: Int = 0,
     val cardCount: Int = 0,
     val activeFormationSize: Int = 0,
+    // true = Slot belegt; Index 0-2 = vordere Reihe, 3-5 = hintere Reihe (FA03)
+    val formationSlots: List<Boolean> = List(6) { false },
     val campaignStarsTotal: Int = 0,
+    val campaignMaxStars: Int = 30, // 10 Level x 3 Sterne
     val isLoading: Boolean = true
 )
 
@@ -39,6 +44,8 @@ class HomeViewModel @Inject constructor(
     private val cardRepository: CardRepository,
     private val currencyDao: CurrencyDao,
     private val arenaDao: ArenaDao,
+    private val formationDao: FormationDao,
+    campaignRepository: CampaignRepository,
     private val weeklyRewardScheduler: WeeklyRewardScheduler
 ) : ViewModel() {
 
@@ -46,19 +53,33 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch { arenaDao.ensureRow() }
     }
 
+    // combine() nimmt max. 5 Flows mit benannten Parametern — Formation + Kampagne
+    // werden deshalb zuerst zu einem Pair gebuendelt und dann aussen dazukombiniert.
+    private val progressFlow = combine(
+        formationDao.observe(),
+        campaignRepository.getAllLevelProgress()
+    ) { formation, levels -> formation to levels }
+
     val uiState: StateFlow<HomeUiState> = combine(
         cardRepository.getAll(),
         currencyDao.observeGems(),
         currencyDao.observeGold(),
-        arenaDao.getProfile()
-    ) { cards, gems, gold, arenaProfile ->
+        arenaDao.getProfile(),
+        progressFlow
+    ) { cards, gems, gold, arenaProfile, progress ->
+        val (formation, levels) = progress
+        val slots = listOf(
+            formation?.slot0, formation?.slot1, formation?.slot2,
+            formation?.slot3, formation?.slot4, formation?.slot5
+        )
         HomeUiState(
             gems = gems ?: 0,
             gold = gold ?: 0,
             trophies = arenaProfile?.trophies ?: 0,
             cardCount = cards.size,
-            activeFormationSize = 0, // TODO: FormationDao (P3)
-            campaignStarsTotal = 0,  // TODO: LevelProgressDao (P4)
+            activeFormationSize = slots.count { it != null },
+            formationSlots = slots.map { it != null },
+            campaignStarsTotal = levels.sumOf { it.stars },
             isLoading = false
         )
     }.stateIn(
@@ -105,7 +126,8 @@ class HomeViewModel @Inject constructor(
         return "Noch nicht fällig — verfügbar in ca. $remainingDays Tag(en)."
     }
 
-    // TODO (Person 5): raus sobald echter Arena-Kampf-Flow existiert (Person 3)
+    // Nur noch Debug-Werkzeug (HomeScreen zeigt den Button nur bei BuildConfig.DEBUG):
+    // der echte Arena-Kampf-Flow laeuft inzwischen ueber ArenaViewModel.onFight().
     fun fakeBattle() {
         viewModelScope.launch {
             val won = kotlin.random.Random.nextBoolean()

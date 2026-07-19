@@ -37,7 +37,8 @@ import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressEntity
 @Composable
 fun CampaignMapScreen(
     viewModel: CampaignViewModel = hiltViewModel(),
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    onStartBattle: (levelId: Int) -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     CampaignMapContent(
@@ -52,8 +53,8 @@ fun CampaignMapScreen(
             level = level,
             onDismiss = { viewModel.onDetailSheetDismissed() },
             onStartBattle = { levelId ->
-                // TODO: Navigation zum Kampf-Screen
                 viewModel.onDetailSheetDismissed()
+                onStartBattle(levelId) // NavGraph -> CampaignBattleScreen (FA04-Trigger)
             }
         )
     }
@@ -223,7 +224,7 @@ private fun LevelNode(
                 }
             }
         }
-        
+
         Text(
             text = if (level.levelId == 10) "BOSS" else "Wald",
             style = MaterialTheme.typography.labelSmall,

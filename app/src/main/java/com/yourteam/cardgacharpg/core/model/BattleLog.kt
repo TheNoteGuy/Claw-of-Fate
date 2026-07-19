@@ -31,6 +31,12 @@ data class RoundEvent(
 
 data class BattleLog(
     val rounds: List<RoundEvent>,
+    // ⚠ CONTRACT-ERWEITERUNG (Person 3): Snapshots beider Formationen zum Zeitpunkt der
+    // Simulation. Die Battle-UI braucht sie, um Formationen + HP-Balken darzustellen und
+    // die HP ueber targetHpAfter Runde fuer Runde nachzuspielen. Defaults = emptyList(),
+    // damit bestehende Konstruktor-Aufrufe (P4/P5) weiter kompilieren.
+    val playerUnits: List<BattleParticipant> = emptyList(),
+    val enemyUnits: List<BattleParticipant> = emptyList(),
     // null nur theoretisch möglich (z.B. leere Formationen auf beiden Seiten) — durch die
     // HP-Prozent-Tiebreak-Regel bei Rundendeckel gibt es sonst IMMER einen Sieger.
     val winner: BattleSide?,

@@ -57,10 +57,10 @@ public final class AppDatabase_Impl extends AppDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(4) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(5) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS `cards` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `heroId` INTEGER NOT NULL, `name` TEXT NOT NULL, `rarity` TEXT NOT NULL, `element` TEXT NOT NULL, `role` TEXT NOT NULL, `level` INTEGER NOT NULL, `xp` INTEGER NOT NULL, `baseHp` INTEGER NOT NULL, `baseAtk` INTEGER NOT NULL, `baseDef` INTEGER NOT NULL, `baseSpd` INTEGER NOT NULL, `currentHp` INTEGER NOT NULL, `currentAtk` INTEGER NOT NULL, `currentDef` INTEGER NOT NULL, `currentSpd` INTEGER NOT NULL, `skill1Id` INTEGER NOT NULL, `skill2Id` INTEGER NOT NULL, `imageAssetName` TEXT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `cards` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `heroId` INTEGER NOT NULL, `name` TEXT NOT NULL, `rarity` TEXT NOT NULL, `element` TEXT NOT NULL, `role` TEXT NOT NULL, `level` INTEGER NOT NULL, `xp` INTEGER NOT NULL, `baseHp` INTEGER NOT NULL, `baseAtk` INTEGER NOT NULL, `baseDef` INTEGER NOT NULL, `baseSpd` INTEGER NOT NULL, `currentHp` INTEGER NOT NULL, `currentAtk` INTEGER NOT NULL, `currentDef` INTEGER NOT NULL, `currentSpd` INTEGER NOT NULL, `skill1Id` INTEGER NOT NULL, `skill2Id` INTEGER NOT NULL, `imageAssetName` TEXT NOT NULL, `count` INTEGER NOT NULL DEFAULT 1)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `inventory` (`itemType` TEXT NOT NULL, `amount` INTEGER NOT NULL, PRIMARY KEY(`itemType`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `gacha_pity` (`id` INTEGER NOT NULL, `pityCount` INTEGER NOT NULL, `lastPullTimestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `currency` (`id` INTEGER NOT NULL, `gems` INTEGER NOT NULL, `gold` INTEGER NOT NULL, PRIMARY KEY(`id`))");
@@ -68,7 +68,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         db.execSQL("CREATE TABLE IF NOT EXISTS `level_progress` (`levelId` INTEGER NOT NULL, `isUnlocked` INTEGER NOT NULL, `stars` INTEGER NOT NULL, PRIMARY KEY(`levelId`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `formation` (`id` INTEGER NOT NULL, `slot0` INTEGER, `slot1` INTEGER, `slot2` INTEGER, `slot3` INTEGER, `slot4` INTEGER, `slot5` INTEGER, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bd74989a9db6f87b9872c592211c29f9')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3baad854aa4a2f04f7f00a6a694f794c')");
       }
 
       @Override
@@ -123,7 +123,7 @@ public final class AppDatabase_Impl extends AppDatabase {
       @NonNull
       public RoomOpenHelper.ValidationResult onValidateSchema(
           @NonNull final SupportSQLiteDatabase db) {
-        final HashMap<String, TableInfo.Column> _columnsCards = new HashMap<String, TableInfo.Column>(19);
+        final HashMap<String, TableInfo.Column> _columnsCards = new HashMap<String, TableInfo.Column>(20);
         _columnsCards.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsCards.put("heroId", new TableInfo.Column("heroId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsCards.put("name", new TableInfo.Column("name", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
@@ -143,6 +143,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         _columnsCards.put("skill1Id", new TableInfo.Column("skill1Id", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsCards.put("skill2Id", new TableInfo.Column("skill2Id", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsCards.put("imageAssetName", new TableInfo.Column("imageAssetName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCards.put("count", new TableInfo.Column("count", "INTEGER", true, 0, "1", TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysCards = new HashSet<TableInfo.ForeignKey>(0);
         final HashSet<TableInfo.Index> _indicesCards = new HashSet<TableInfo.Index>(0);
         final TableInfo _infoCards = new TableInfo("cards", _columnsCards, _foreignKeysCards, _indicesCards);
@@ -236,7 +237,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "bd74989a9db6f87b9872c592211c29f9", "c97219dc74fc5915b70da69c4990cb5e");
+    }, "3baad854aa4a2f04f7f00a6a694f794c", "c07aba54f0cecff9849464fada93a16f");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

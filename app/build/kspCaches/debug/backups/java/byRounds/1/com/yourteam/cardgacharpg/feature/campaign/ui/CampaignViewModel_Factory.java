@@ -1,7 +1,7 @@
 package com.yourteam.cardgacharpg.feature.campaign.ui;
 
 import com.yourteam.cardgacharpg.feature.campaign.data.CampaignRepository;
-import com.yourteam.cardgacharpg.feature.campaign.domain.StarRatingUseCase;
+import com.yourteam.cardgacharpg.feature.campaign.domain.CompleteCampaignLevelUseCase;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;
@@ -26,27 +26,27 @@ import javax.inject.Provider;
 public final class CampaignViewModel_Factory implements Factory<CampaignViewModel> {
   private final Provider<CampaignRepository> campaignRepositoryProvider;
 
-  private final Provider<StarRatingUseCase> starRatingUseCaseProvider;
+  private final Provider<CompleteCampaignLevelUseCase> completeCampaignLevelUseCaseProvider;
 
   public CampaignViewModel_Factory(Provider<CampaignRepository> campaignRepositoryProvider,
-      Provider<StarRatingUseCase> starRatingUseCaseProvider) {
+      Provider<CompleteCampaignLevelUseCase> completeCampaignLevelUseCaseProvider) {
     this.campaignRepositoryProvider = campaignRepositoryProvider;
-    this.starRatingUseCaseProvider = starRatingUseCaseProvider;
+    this.completeCampaignLevelUseCaseProvider = completeCampaignLevelUseCaseProvider;
   }
 
   @Override
   public CampaignViewModel get() {
-    return newInstance(campaignRepositoryProvider.get(), starRatingUseCaseProvider.get());
+    return newInstance(campaignRepositoryProvider.get(), completeCampaignLevelUseCaseProvider.get());
   }
 
   public static CampaignViewModel_Factory create(
       Provider<CampaignRepository> campaignRepositoryProvider,
-      Provider<StarRatingUseCase> starRatingUseCaseProvider) {
-    return new CampaignViewModel_Factory(campaignRepositoryProvider, starRatingUseCaseProvider);
+      Provider<CompleteCampaignLevelUseCase> completeCampaignLevelUseCaseProvider) {
+    return new CampaignViewModel_Factory(campaignRepositoryProvider, completeCampaignLevelUseCaseProvider);
   }
 
   public static CampaignViewModel newInstance(CampaignRepository campaignRepository,
-      StarRatingUseCase starRatingUseCase) {
-    return new CampaignViewModel(campaignRepository, starRatingUseCase);
+      CompleteCampaignLevelUseCase completeCampaignLevelUseCase) {
+    return new CampaignViewModel(campaignRepository, completeCampaignLevelUseCase);
   }
 }

@@ -29,7 +29,8 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext ctx: Context): AppDatabase =
         Room.databaseBuilder(ctx, AppDatabase::class.java, "claw_of_fate.db")
-            .fallbackToDestructiveMigration() // MVP: bei Schema-Änderung DB neu aufbauen
+            .addMigrations(AppDatabase.MIGRATION_4_5) // v5: cards.count (Karten-Stacking)
+            .fallbackToDestructiveMigration() // MVP-Sicherheitsnetz fuer alle uebrigen Sprünge
             .build()
 
     // --- Person 1 (Karten) ---

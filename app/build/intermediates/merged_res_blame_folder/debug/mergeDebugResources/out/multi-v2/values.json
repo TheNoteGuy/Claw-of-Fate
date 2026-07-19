@@ -207,25 +207,6 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\src\\main\\res\\values\\themes.xml",
-                    "from": {
-                        "startLines": "5",
-                        "startColumns": "4",
-                        "startOffsets": "293",
-                        "endLines": "7",
-                        "endColumns": "12",
-                        "endOffsets": "463"
-                    },
-                    "to": {
-                        "startLines": "6390",
-                        "startColumns": "4",
-                        "startOffsets": "449123",
-                        "endLines": "6392",
-                        "endColumns": "12",
-                        "endOffsets": "449293"
-                    }
-                },
-                {
                     "source": "C:\\Users\\user\\.gradle\\caches\\9.0.0\\transforms\\939cdd6c0de792a12431135b2a95c2fa\\transformed\\navigation-common-2.7.7\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2,15,21,27,30",
@@ -261,23 +242,6 @@
                         "endLines": "94,9265,10641,10725",
                         "endColumns": "60,12,24,24",
                         "endOffsets": "5072,644682,704339,708855"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\user\\StudioProjects\\Claw-of-Fate\\app\\src\\main\\res\\values\\strings.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "49",
-                        "endOffsets": "100"
-                    },
-                    "to": {
-                        "startLines": "1909",
-                        "startColumns": "4",
-                        "startOffsets": "128042",
-                        "endColumns": "49",
-                        "endOffsets": "128087"
                     }
                 },
                 {
@@ -423,6 +387,23 @@
                     }
                 },
                 {
+                    "source": "C:\\Users\\user\\StudioProjects\\Claw-of-Fate_Abgabe_Version\\app\\src\\main\\res\\values\\strings.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "57",
+                        "endColumns": "49",
+                        "endOffsets": "102"
+                    },
+                    "to": {
+                        "startLines": "1909",
+                        "startColumns": "4",
+                        "startOffsets": "128042",
+                        "endColumns": "49",
+                        "endOffsets": "128087"
+                    }
+                },
+                {
                     "source": "C:\\Users\\user\\.gradle\\caches\\9.0.0\\transforms\\c4b442c211bd5e5bded572de36a0163c\\transformed\\savedstate-1.2.1\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
@@ -456,6 +437,25 @@
                         "endLines": "121,124,976,10748",
                         "endColumns": "55,47,51,24",
                         "endOffsets": "6200,6356,59375,710041"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\user\\StudioProjects\\Claw-of-Fate_Abgabe_Version\\app\\src\\main\\res\\values\\themes.xml",
+                    "from": {
+                        "startLines": "5",
+                        "startColumns": "4",
+                        "startOffsets": "298",
+                        "endLines": "7",
+                        "endColumns": "12",
+                        "endOffsets": "470"
+                    },
+                    "to": {
+                        "startLines": "6390",
+                        "startColumns": "4",
+                        "startOffsets": "449123",
+                        "endLines": "6392",
+                        "endColumns": "12",
+                        "endOffsets": "449293"
                     }
                 },
                 {

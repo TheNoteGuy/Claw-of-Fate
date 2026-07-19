@@ -3,9 +3,6 @@ package com.yourteam.cardgacharpg.feature.arena.ui
 // Owner: Person 5 (Robin) — Dashboard-Hub
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.yourteam.cardgacharpg.BuildConfig
 import com.yourteam.cardgacharpg.feature.arena.domain.TrophyManager
 
 @Composable
@@ -56,10 +54,15 @@ fun HomeScreen(
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 TrophyBadge(trophies = uiState.trophies, modifier = Modifier.weight(1f))
-                CampaignProgressCard(starsTotal = uiState.campaignStarsTotal, modifier = Modifier.weight(1f))
+                CampaignProgressCard(
+                    starsTotal = uiState.campaignStarsTotal,
+                    maxStars = uiState.campaignMaxStars,
+                    modifier = Modifier.weight(1f)
+                )
             }
 
             FormationPreviewCard(
+                formationSlots = uiState.formationSlots,
                 activeFormationSize = uiState.activeFormationSize,
                 cardCount = uiState.cardCount,
                 onClick = onOpenFormation
@@ -76,13 +79,16 @@ fun HomeScreen(
             Button(onClick = viewModel::claimWeeklyReward, modifier = Modifier.fillMaxWidth()) {
                 Text("🎁 Weekly Reward abholen")
             }
-            TextButton(onClick = viewModel::skipCooldownAndClaim, modifier = Modifier.fillMaxWidth()) {
-                Text("⏭ Cooldown überspringen (Debug/Demo)")
-            }
 
-            // TEMP (Person 5): siehe HomeViewModel.fakeBattle()
-            OutlinedButton(onClick = viewModel::fakeBattle, modifier = Modifier.fillMaxWidth()) {
-                Text("🎲 Fake-Kampf (Trophy-Test)")
+            // Debug-Werkzeuge nur in Debug-Builds sichtbar (BuildConfig.DEBUG) —
+            // im Release/Abgabe-Build (assembleRelease) verschwinden beide Buttons.
+            if (BuildConfig.DEBUG) {
+                TextButton(onClick = viewModel::skipCooldownAndClaim, modifier = Modifier.fillMaxWidth()) {
+                    Text("⏭ Cooldown überspringen (Debug)")
+                }
+                OutlinedButton(onClick = viewModel::fakeBattle, modifier = Modifier.fillMaxWidth()) {
+                    Text("🎲 Fake-Kampf (Trophy-Test, Debug)")
+                }
             }
         }
     }
@@ -92,17 +98,20 @@ fun HomeScreen(
 private fun CurrencyBar(gems: Int, gold: Int) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-            CurrencyItem(label = "Gems", value = gems)
-            CurrencyItem(label = "Gold", value = gold)
+            CurrencyItem(icon = "💎", label = "Gems", value = gems)
+            CurrencyItem(icon = "🪙", label = "Gold", value = gold)
         }
     }
 }
 
 @Composable
-private fun CurrencyItem(label: String, value: Int) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = value.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        Text(text = label, style = MaterialTheme.typography.labelMedium)
+private fun CurrencyItem(icon: String, label: String, value: Int) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = icon, style = MaterialTheme.typography.titleLarge)
+        Column {
+            Text(text = value.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(text = label, style = MaterialTheme.typography.labelMedium)
+        }
     }
 }
 
@@ -113,9 +122,9 @@ private fun TrophyBadge(trophies: Int, modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = trophies.toString(), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text(text = "🏆 $trophies", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Text(
-                text = "Trophäen — ${TrophyManager.leagueFor(trophies).displayName}",
+                text = TrophyManager.leagueFor(trophies).displayName + "-Liga",
                 style = MaterialTheme.typography.labelMedium
             )
         }
@@ -123,32 +132,48 @@ private fun TrophyBadge(trophies: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun CampaignProgressCard(starsTotal: Int, modifier: Modifier = Modifier) {
+private fun CampaignProgressCard(starsTotal: Int, maxStars: Int, modifier: Modifier = Modifier) {
     Card(modifier = modifier) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "$starsTotal ★", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text(
+                text = "$starsTotal / $maxStars ★",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(4.dp))
+            LinearProgressIndicator(
+                progress = { if (maxStars > 0) starsTotal.toFloat() / maxStars else 0f },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(4.dp))
             Text(text = "Kampagne", style = MaterialTheme.typography.labelMedium)
         }
     }
 }
 
 @Composable
-private fun FormationPreviewCard(activeFormationSize: Int, cardCount: Int, onClick: () -> Unit) {
+private fun FormationPreviewCard(
+    formationSlots: List<Boolean>,
+    activeFormationSize: Int,
+    cardCount: Int,
+    onClick: () -> Unit
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Aktive Formation", style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = "Aktive Formation ($activeFormationSize/6)",
+                style = MaterialTheme.typography.titleMedium
+            )
             Spacer(Modifier.height(8.dp))
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.height(72.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                items(6) { index -> FormationSlot(filled = index < activeFormationSize) }
+            // Echtes Slot-Layout aus der DB: hintere Reihe (Slots 3-5) oben,
+            // vordere Reihe (Slots 0-2) unten — wie im Formations-Editor / Kampf.
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                FormationRow(slots = formationSlots, indices = listOf(3, 4, 5))
+                FormationRow(slots = formationSlots, indices = listOf(0, 1, 2))
             }
 
             Spacer(Modifier.height(8.dp))
@@ -164,13 +189,29 @@ private fun FormationPreviewCard(activeFormationSize: Int, cardCount: Int, onCli
 }
 
 @Composable
-private fun FormationSlot(filled: Boolean) {
-    Box(modifier = Modifier.fillMaxWidth().height(32.dp), contentAlignment = Alignment.Center) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            tonalElevation = if (filled) 4.dp else 0.dp,
-            color = if (filled) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-        ) {}
+private fun FormationRow(slots: List<Boolean>, indices: List<Int>) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        indices.forEach { index ->
+            FormationSlot(
+                filled = slots.getOrElse(index) { false },
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun FormationSlot(filled: Boolean, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.height(32.dp),
+        tonalElevation = if (filled) 4.dp else 0.dp,
+        color = if (filled) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+    ) {
+        if (filled) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(text = "⚔", style = MaterialTheme.typography.labelMedium)
+            }
+        }
     }
 }
 

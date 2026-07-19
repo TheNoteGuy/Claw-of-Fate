@@ -1,13 +1,16 @@
 package com.yourteam.cardgacharpg.feature.collection.data;
 
 import android.database.Cursor;
+import android.os.CancellationSignal;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.CoroutinesRoom;
 import androidx.room.EntityDeletionOrUpdateAdapter;
 import androidx.room.EntityInsertionAdapter;
 import androidx.room.RoomDatabase;
+import androidx.room.RoomDatabaseKt;
 import androidx.room.RoomSQLiteQuery;
+import androidx.room.SharedSQLiteStatement;
 import androidx.room.util.CursorUtil;
 import androidx.room.util.DBUtil;
 import androidx.sqlite.db.SupportSQLiteStatement;
@@ -42,13 +45,15 @@ public final class CardDao_Impl implements CardDao {
 
   private final EntityDeletionOrUpdateAdapter<CardEntity> __updateAdapterOfCardEntity;
 
+  private final SharedSQLiteStatement __preparedStmtOfAddToCount;
+
   public CardDao_Impl(@NonNull final RoomDatabase __db) {
     this.__db = __db;
     this.__insertionAdapterOfCardEntity = new EntityInsertionAdapter<CardEntity>(__db) {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR ABORT INTO `cards` (`id`,`heroId`,`name`,`rarity`,`element`,`role`,`level`,`xp`,`baseHp`,`baseAtk`,`baseDef`,`baseSpd`,`currentHp`,`currentAtk`,`currentDef`,`currentSpd`,`skill1Id`,`skill2Id`,`imageAssetName`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR ABORT INTO `cards` (`id`,`heroId`,`name`,`rarity`,`element`,`role`,`level`,`xp`,`baseHp`,`baseAtk`,`baseDef`,`baseSpd`,`currentHp`,`currentAtk`,`currentDef`,`currentSpd`,`skill1Id`,`skill2Id`,`imageAssetName`,`count`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -76,13 +81,14 @@ public final class CardDao_Impl implements CardDao {
         statement.bindLong(17, entity.getSkill1Id());
         statement.bindLong(18, entity.getSkill2Id());
         statement.bindString(19, entity.getImageAssetName());
+        statement.bindLong(20, entity.getCount());
       }
     };
     this.__updateAdapterOfCardEntity = new EntityDeletionOrUpdateAdapter<CardEntity>(__db) {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `cards` SET `id` = ?,`heroId` = ?,`name` = ?,`rarity` = ?,`element` = ?,`role` = ?,`level` = ?,`xp` = ?,`baseHp` = ?,`baseAtk` = ?,`baseDef` = ?,`baseSpd` = ?,`currentHp` = ?,`currentAtk` = ?,`currentDef` = ?,`currentSpd` = ?,`skill1Id` = ?,`skill2Id` = ?,`imageAssetName` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `cards` SET `id` = ?,`heroId` = ?,`name` = ?,`rarity` = ?,`element` = ?,`role` = ?,`level` = ?,`xp` = ?,`baseHp` = ?,`baseAtk` = ?,`baseDef` = ?,`baseSpd` = ?,`currentHp` = ?,`currentAtk` = ?,`currentDef` = ?,`currentSpd` = ?,`skill1Id` = ?,`skill2Id` = ?,`imageAssetName` = ?,`count` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -110,7 +116,16 @@ public final class CardDao_Impl implements CardDao {
         statement.bindLong(17, entity.getSkill1Id());
         statement.bindLong(18, entity.getSkill2Id());
         statement.bindString(19, entity.getImageAssetName());
-        statement.bindLong(20, entity.getId());
+        statement.bindLong(20, entity.getCount());
+        statement.bindLong(21, entity.getId());
+      }
+    };
+    this.__preparedStmtOfAddToCount = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "UPDATE cards SET count = count + ? WHERE id = ?";
+        return _query;
       }
     };
   }
@@ -171,6 +186,40 @@ public final class CardDao_Impl implements CardDao {
   }
 
   @Override
+  public Object insertOrStack(final List<CardEntity> cards,
+      final Continuation<? super Unit> $completion) {
+    return RoomDatabaseKt.withTransaction(__db, (__cont) -> CardDao.DefaultImpls.insertOrStack(CardDao_Impl.this, cards, __cont), $completion);
+  }
+
+  @Override
+  public Object addToCount(final int id, final int delta,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final SupportSQLiteStatement _stmt = __preparedStmtOfAddToCount.acquire();
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, delta);
+        _argIndex = 2;
+        _stmt.bindLong(_argIndex, id);
+        try {
+          __db.beginTransaction();
+          try {
+            _stmt.executeUpdateDelete();
+            __db.setTransactionSuccessful();
+            return Unit.INSTANCE;
+          } finally {
+            __db.endTransaction();
+          }
+        } finally {
+          __preparedStmtOfAddToCount.release(_stmt);
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
   public Flow<List<CardEntity>> getAll() {
     final String _sql = "SELECT * FROM cards ORDER BY level DESC, id ASC";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
@@ -199,6 +248,7 @@ public final class CardDao_Impl implements CardDao {
           final int _cursorIndexOfSkill1Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill1Id");
           final int _cursorIndexOfSkill2Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill2Id");
           final int _cursorIndexOfImageAssetName = CursorUtil.getColumnIndexOrThrow(_cursor, "imageAssetName");
+          final int _cursorIndexOfCount = CursorUtil.getColumnIndexOrThrow(_cursor, "count");
           final List<CardEntity> _result = new ArrayList<CardEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final CardEntity _item;
@@ -246,7 +296,9 @@ public final class CardDao_Impl implements CardDao {
             _tmpSkill2Id = _cursor.getInt(_cursorIndexOfSkill2Id);
             final String _tmpImageAssetName;
             _tmpImageAssetName = _cursor.getString(_cursorIndexOfImageAssetName);
-            _item = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName);
+            final int _tmpCount;
+            _tmpCount = _cursor.getInt(_cursorIndexOfCount);
+            _item = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName,_tmpCount);
             _result.add(_item);
           }
           return _result;
@@ -294,6 +346,7 @@ public final class CardDao_Impl implements CardDao {
           final int _cursorIndexOfSkill1Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill1Id");
           final int _cursorIndexOfSkill2Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill2Id");
           final int _cursorIndexOfImageAssetName = CursorUtil.getColumnIndexOrThrow(_cursor, "imageAssetName");
+          final int _cursorIndexOfCount = CursorUtil.getColumnIndexOrThrow(_cursor, "count");
           final List<CardEntity> _result = new ArrayList<CardEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final CardEntity _item;
@@ -341,7 +394,9 @@ public final class CardDao_Impl implements CardDao {
             _tmpSkill2Id = _cursor.getInt(_cursorIndexOfSkill2Id);
             final String _tmpImageAssetName;
             _tmpImageAssetName = _cursor.getString(_cursorIndexOfImageAssetName);
-            _item = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName);
+            final int _tmpCount;
+            _tmpCount = _cursor.getInt(_cursorIndexOfCount);
+            _item = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName,_tmpCount);
             _result.add(_item);
           }
           return _result;
@@ -389,6 +444,7 @@ public final class CardDao_Impl implements CardDao {
           final int _cursorIndexOfSkill1Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill1Id");
           final int _cursorIndexOfSkill2Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill2Id");
           final int _cursorIndexOfImageAssetName = CursorUtil.getColumnIndexOrThrow(_cursor, "imageAssetName");
+          final int _cursorIndexOfCount = CursorUtil.getColumnIndexOrThrow(_cursor, "count");
           final List<CardEntity> _result = new ArrayList<CardEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final CardEntity _item;
@@ -436,7 +492,9 @@ public final class CardDao_Impl implements CardDao {
             _tmpSkill2Id = _cursor.getInt(_cursorIndexOfSkill2Id);
             final String _tmpImageAssetName;
             _tmpImageAssetName = _cursor.getString(_cursorIndexOfImageAssetName);
-            _item = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName);
+            final int _tmpCount;
+            _tmpCount = _cursor.getInt(_cursorIndexOfCount);
+            _item = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName,_tmpCount);
             _result.add(_item);
           }
           return _result;
@@ -483,6 +541,7 @@ public final class CardDao_Impl implements CardDao {
           final int _cursorIndexOfSkill1Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill1Id");
           final int _cursorIndexOfSkill2Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill2Id");
           final int _cursorIndexOfImageAssetName = CursorUtil.getColumnIndexOrThrow(_cursor, "imageAssetName");
+          final int _cursorIndexOfCount = CursorUtil.getColumnIndexOrThrow(_cursor, "count");
           final CardEntity _result;
           if (_cursor.moveToFirst()) {
             final int _tmpId;
@@ -529,7 +588,9 @@ public final class CardDao_Impl implements CardDao {
             _tmpSkill2Id = _cursor.getInt(_cursorIndexOfSkill2Id);
             final String _tmpImageAssetName;
             _tmpImageAssetName = _cursor.getString(_cursorIndexOfImageAssetName);
-            _result = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName);
+            final int _tmpCount;
+            _tmpCount = _cursor.getInt(_cursorIndexOfCount);
+            _result = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName,_tmpCount);
           } else {
             _result = null;
           }
@@ -544,6 +605,104 @@ public final class CardDao_Impl implements CardDao {
         _statement.release();
       }
     });
+  }
+
+  @Override
+  public Object findByHeroAndRarity(final int heroId, final Rarity rarity,
+      final Continuation<? super CardEntity> $completion) {
+    final String _sql = "SELECT * FROM cards WHERE heroId = ? AND rarity = ? LIMIT 1";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, heroId);
+    _argIndex = 2;
+    final String _tmp = __converters.fromRarity(rarity);
+    _statement.bindString(_argIndex, _tmp);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<CardEntity>() {
+      @Override
+      @Nullable
+      public CardEntity call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfHeroId = CursorUtil.getColumnIndexOrThrow(_cursor, "heroId");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfRarity = CursorUtil.getColumnIndexOrThrow(_cursor, "rarity");
+          final int _cursorIndexOfElement = CursorUtil.getColumnIndexOrThrow(_cursor, "element");
+          final int _cursorIndexOfRole = CursorUtil.getColumnIndexOrThrow(_cursor, "role");
+          final int _cursorIndexOfLevel = CursorUtil.getColumnIndexOrThrow(_cursor, "level");
+          final int _cursorIndexOfXp = CursorUtil.getColumnIndexOrThrow(_cursor, "xp");
+          final int _cursorIndexOfBaseHp = CursorUtil.getColumnIndexOrThrow(_cursor, "baseHp");
+          final int _cursorIndexOfBaseAtk = CursorUtil.getColumnIndexOrThrow(_cursor, "baseAtk");
+          final int _cursorIndexOfBaseDef = CursorUtil.getColumnIndexOrThrow(_cursor, "baseDef");
+          final int _cursorIndexOfBaseSpd = CursorUtil.getColumnIndexOrThrow(_cursor, "baseSpd");
+          final int _cursorIndexOfCurrentHp = CursorUtil.getColumnIndexOrThrow(_cursor, "currentHp");
+          final int _cursorIndexOfCurrentAtk = CursorUtil.getColumnIndexOrThrow(_cursor, "currentAtk");
+          final int _cursorIndexOfCurrentDef = CursorUtil.getColumnIndexOrThrow(_cursor, "currentDef");
+          final int _cursorIndexOfCurrentSpd = CursorUtil.getColumnIndexOrThrow(_cursor, "currentSpd");
+          final int _cursorIndexOfSkill1Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill1Id");
+          final int _cursorIndexOfSkill2Id = CursorUtil.getColumnIndexOrThrow(_cursor, "skill2Id");
+          final int _cursorIndexOfImageAssetName = CursorUtil.getColumnIndexOrThrow(_cursor, "imageAssetName");
+          final int _cursorIndexOfCount = CursorUtil.getColumnIndexOrThrow(_cursor, "count");
+          final CardEntity _result;
+          if (_cursor.moveToFirst()) {
+            final int _tmpId;
+            _tmpId = _cursor.getInt(_cursorIndexOfId);
+            final int _tmpHeroId;
+            _tmpHeroId = _cursor.getInt(_cursorIndexOfHeroId);
+            final String _tmpName;
+            _tmpName = _cursor.getString(_cursorIndexOfName);
+            final Rarity _tmpRarity;
+            final String _tmp_1;
+            _tmp_1 = _cursor.getString(_cursorIndexOfRarity);
+            _tmpRarity = __converters.toRarity(_tmp_1);
+            final Element _tmpElement;
+            final String _tmp_2;
+            _tmp_2 = _cursor.getString(_cursorIndexOfElement);
+            _tmpElement = __converters.toElement(_tmp_2);
+            final Role _tmpRole;
+            final String _tmp_3;
+            _tmp_3 = _cursor.getString(_cursorIndexOfRole);
+            _tmpRole = __converters.toRole(_tmp_3);
+            final int _tmpLevel;
+            _tmpLevel = _cursor.getInt(_cursorIndexOfLevel);
+            final int _tmpXp;
+            _tmpXp = _cursor.getInt(_cursorIndexOfXp);
+            final int _tmpBaseHp;
+            _tmpBaseHp = _cursor.getInt(_cursorIndexOfBaseHp);
+            final int _tmpBaseAtk;
+            _tmpBaseAtk = _cursor.getInt(_cursorIndexOfBaseAtk);
+            final int _tmpBaseDef;
+            _tmpBaseDef = _cursor.getInt(_cursorIndexOfBaseDef);
+            final int _tmpBaseSpd;
+            _tmpBaseSpd = _cursor.getInt(_cursorIndexOfBaseSpd);
+            final int _tmpCurrentHp;
+            _tmpCurrentHp = _cursor.getInt(_cursorIndexOfCurrentHp);
+            final int _tmpCurrentAtk;
+            _tmpCurrentAtk = _cursor.getInt(_cursorIndexOfCurrentAtk);
+            final int _tmpCurrentDef;
+            _tmpCurrentDef = _cursor.getInt(_cursorIndexOfCurrentDef);
+            final int _tmpCurrentSpd;
+            _tmpCurrentSpd = _cursor.getInt(_cursorIndexOfCurrentSpd);
+            final int _tmpSkill1Id;
+            _tmpSkill1Id = _cursor.getInt(_cursorIndexOfSkill1Id);
+            final int _tmpSkill2Id;
+            _tmpSkill2Id = _cursor.getInt(_cursorIndexOfSkill2Id);
+            final String _tmpImageAssetName;
+            _tmpImageAssetName = _cursor.getString(_cursorIndexOfImageAssetName);
+            final int _tmpCount;
+            _tmpCount = _cursor.getInt(_cursorIndexOfCount);
+            _result = new CardEntity(_tmpId,_tmpHeroId,_tmpName,_tmpRarity,_tmpElement,_tmpRole,_tmpLevel,_tmpXp,_tmpBaseHp,_tmpBaseAtk,_tmpBaseDef,_tmpBaseSpd,_tmpCurrentHp,_tmpCurrentAtk,_tmpCurrentDef,_tmpCurrentSpd,_tmpSkill1Id,_tmpSkill2Id,_tmpImageAssetName,_tmpCount);
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
   }
 
   @NonNull

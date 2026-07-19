@@ -95,6 +95,8 @@ object BattleSimulator {
 
         return BattleLog(
             rounds = rounds,
+            playerUnits = player.all,
+            enemyUnits = enemy.all,
             winner = winner,
             playerSurvivors = playerAliveCount,
             playerTotalUnits = playerUnits.size,

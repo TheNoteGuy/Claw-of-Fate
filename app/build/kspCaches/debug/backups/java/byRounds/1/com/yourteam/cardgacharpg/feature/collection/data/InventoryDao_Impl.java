@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.room.CoroutinesRoom;
 import androidx.room.EntityInsertionAdapter;
 import androidx.room.RoomDatabase;
+import androidx.room.RoomDatabaseKt;
 import androidx.room.RoomSQLiteQuery;
 import androidx.room.SharedSQLiteStatement;
 import androidx.room.util.CursorUtil;
@@ -35,6 +36,8 @@ public final class InventoryDao_Impl implements InventoryDao {
 
   private final Converters __converters = new Converters();
 
+  private final EntityInsertionAdapter<InventoryEntity> __insertionAdapterOfInventoryEntity_1;
+
   private final SharedSQLiteStatement __preparedStmtOfAdjustAmount;
 
   public InventoryDao_Impl(@NonNull final RoomDatabase __db) {
@@ -44,6 +47,21 @@ public final class InventoryDao_Impl implements InventoryDao {
       @NonNull
       protected String createQuery() {
         return "INSERT OR REPLACE INTO `inventory` (`itemType`,`amount`) VALUES (?,?)";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final InventoryEntity entity) {
+        final String _tmp = __converters.fromItemType(entity.getItemType());
+        statement.bindString(1, _tmp);
+        statement.bindLong(2, entity.getAmount());
+      }
+    };
+    this.__insertionAdapterOfInventoryEntity_1 = new EntityInsertionAdapter<InventoryEntity>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "INSERT OR IGNORE INTO `inventory` (`itemType`,`amount`) VALUES (?,?)";
       }
 
       @Override
@@ -80,6 +98,31 @@ public final class InventoryDao_Impl implements InventoryDao {
         }
       }
     }, $completion);
+  }
+
+  @Override
+  public Object insertIfAbsent(final InventoryEntity entity,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __insertionAdapterOfInventoryEntity_1.insert(entity);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object addAmount(final ItemType itemType, final int delta,
+      final Continuation<? super Unit> $completion) {
+    return RoomDatabaseKt.withTransaction(__db, (__cont) -> InventoryDao.DefaultImpls.addAmount(InventoryDao_Impl.this, itemType, delta, __cont), $completion);
   }
 
   @Override

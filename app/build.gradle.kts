@@ -19,6 +19,9 @@ android {
 
     buildFeatures {
         compose = true
+        // Fuer BuildConfig.DEBUG (Debug-Buttons auf dem HomeScreen) — AGP 8 generiert
+        // BuildConfig sonst nicht mehr automatisch.
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"

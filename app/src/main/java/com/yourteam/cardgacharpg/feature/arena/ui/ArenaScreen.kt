@@ -111,7 +111,7 @@ fun ArenaScreen(
             Spacer(Modifier.height(8.dp))
             if (state.playerPreview.isEmpty()) {
                 Text(
-                    "Du brauchst mindestens eine Karte in deiner Sammlung, um anzutreten.",
+                    "Keine aktive Formation — platziere zuerst Helden im Formations-Editor.",
                     style = MaterialTheme.typography.bodySmall
                 )
             } else {

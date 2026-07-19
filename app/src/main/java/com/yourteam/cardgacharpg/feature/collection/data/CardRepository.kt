@@ -12,7 +12,12 @@ import javax.inject.Inject
 // Schnittstellenvertrag (ab Woche 2 stabil zu halten, siehe Projektplan Abschnitt 5):
 // - CardRepository.getAll(): Flow<List<Card>>  -> gibt alle Karten inkl. Level und Stats zurück
 // - CardRepository.insertAll(cards)             -> Bulk-Insert nach Gacha-Pull (Person 2)
-
+//
+// ⚠ CONTRACT-AENDERUNG (Karten-Stacking, mit Nico abgestimmt):
+// insertAll() gibt jetzt Unit statt List<Long> zurueck. Grund: Duplikate (gleicher heroId +
+// rarity) erzeugen KEINE neue Zeile mehr, sondern erhoehen count auf der bestehenden Karte —
+// eine Liste neuer Row-IDs waere daher irrefuehrend. Einziger Consumer (GachaViewModel,
+// Person 2) hat den Rueckgabewert nie benutzt, kompiliert also unveraendert.
 
 class CardRepository @Inject constructor(
     private val cardDao: CardDao
@@ -37,9 +42,14 @@ class CardRepository @Inject constructor(
     suspend fun insert(card: Card): Long =
         cardDao.insert(card.toEntity())
 
-    // Wird von Person 2 (GachaViewModel) nach jedem Pull aufgerufen
-    suspend fun insertAll(cards: List<Card>): List<Long> =
-        cardDao.insertAll(cards.map { it.toEntity() })
+    /**
+     * Wird von Person 2 (GachaViewModel) nach jedem Pull aufgerufen.
+     * Stacking-Regel: existiert bereits eine Karte mit gleichem heroId + rarity, wird deren
+     * count erhoeht statt eine neue Zeile einzufuegen (siehe CardDao.insertOrStack()).
+     */
+    suspend fun insertAll(cards: List<Card>) {
+        cardDao.insertOrStack(cards.map { it.toEntity() })
+    }
 }
 
 // --- Mapper: Entity (Persistenz) <-> Domain-Modell (App-weit geteilt) ---
@@ -63,7 +73,8 @@ private fun CardEntity.toDomain(): Card = Card(
     currentSpd = currentSpd,
     skill1Id = skill1Id,
     skill2Id = skill2Id,
-    imageAssetName = imageAssetName
+    imageAssetName = imageAssetName,
+    count = count
 )
 
 private fun Card.toEntity(): CardEntity = CardEntity(
@@ -85,5 +96,6 @@ private fun Card.toEntity(): CardEntity = CardEntity(
     currentSpd = currentSpd,
     skill1Id = skill1Id,
     skill2Id = skill2Id,
-    imageAssetName = imageAssetName
+    imageAssetName = imageAssetName,
+    count = count
 )

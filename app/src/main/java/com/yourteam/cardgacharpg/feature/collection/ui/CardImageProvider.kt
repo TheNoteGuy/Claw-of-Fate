@@ -39,7 +39,7 @@ object CardImageProvider {
         "hero_water_legendary" to R.drawable.hero_water_legendary,
 
 
-    )
+        )
 
     /** Liefert die Drawable-Resource-ID für [assetName], oder null wenn (noch) kein Asset existiert. */
     @DrawableRes

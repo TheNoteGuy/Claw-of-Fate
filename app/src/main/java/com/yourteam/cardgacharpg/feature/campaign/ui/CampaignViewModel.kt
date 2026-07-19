@@ -2,12 +2,10 @@ package com.yourteam.cardgacharpg.feature.campaign.ui
 
 // Owner: Person 4 (Yassin)
 import androidx.lifecycle.ViewModel
-import com.yourteam.cardgacharpg.feature.campaign.data.CampaignRepository
-import com.yourteam.cardgacharpg.feature.campaign.domain.StarRatingUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
-import com.yourteam.cardgacharpg.feature.campaign.data.LevelProgressEntity
+import com.yourteam.cardgacharpg.feature.campaign.data.CampaignRepository
+import com.yourteam.cardgacharpg.feature.campaign.domain.CompleteCampaignLevelUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,11 +13,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class CampaignViewModel @Inject constructor(
     private val campaignRepository: CampaignRepository,
-    private val starRatingUseCase: StarRatingUseCase
+    private val completeCampaignLevelUseCase: CompleteCampaignLevelUseCase
 ) : ViewModel() {
 
     // 1. Interner Notizzettel (Transient State)
@@ -67,31 +66,19 @@ class CampaignViewModel @Inject constructor(
     // KAMPF LOGIK (Nach dem Match)
     // =========================================
 
-    /** Diese Methode wird aufgerufen, sobald das Match-Ergebnis feststeht. */
+    /**
+     * Kompatibilitäts-API: Sterne-Vergabe, Freischaltung UND Belohnungs-Gutschrift
+     * (Gold/Gems/XP-Tränke) laufen jetzt gebündelt im CompleteCampaignLevelUseCase.
+     *
+     * HINWEIS: Der eigentliche Kampagnen-Kampf-Flow (CampaignBattleViewModel) ruft den
+     * UseCase direkt auf und braucht diese Methode NICHT — sie bleibt nur erhalten, falls
+     * andere Stellen (z.B. ein manueller Test-Trigger) ein Kampfergebnis melden wollen.
+     * Achtung: pro Kampf nur EINE der beiden Stellen aufrufen, sonst werden Belohnungen
+     * doppelt gutgeschrieben.
+     */
     fun onBattleFinished(levelId: Int, isVictory: Boolean, survivingUnits: Int, totalUnits: Int) {
         viewModelScope.launch {
-            // 1. Sterne berechnen
-            val earnedStars = starRatingUseCase.calculateStars(isVictory, survivingUnits, totalUnits)
-
-            if (earnedStars > 0) {
-                // 2. Schnappschuss aus dem State holen (Sicher vor Endlosschleifen!)
-                val currentLevels = uiState.value.levels
-                val playedLevel = currentLevels.find { it.levelId == levelId }
-
-                if (playedLevel != null) {
-                    // Sterne eintragen (nur wenn sie besser sind als vorher)
-                    val bestStars = maxOf(playedLevel.stars, earnedStars)
-                    campaignRepository.updateLevelProgress(playedLevel.copy(stars = bestStars))
-
-                    // 3. Nächstes Level freischalten
-                    if (levelId < LevelProgressEntity.TOTAL_LEVELS) {
-                        val nextLevel = currentLevels.find { it.levelId == levelId + 1 }
-                        if (nextLevel != null && !nextLevel.isUnlocked) {
-                            campaignRepository.updateLevelProgress(nextLevel.copy(isUnlocked = true))
-                        }
-                    }
-                }
-            }
+            completeCampaignLevelUseCase(levelId, isVictory, survivingUnits, totalUnits)
         }
     }
 }

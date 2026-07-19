@@ -1,6 +1,7 @@
 package com.yourteam.cardgacharpg.feature.collection.data
 
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.yourteam.cardgacharpg.core.model.Element
@@ -30,5 +31,8 @@ data class CardEntity(
     val currentSpd: Int,
     val skill1Id: Int,
     val skill2Id: Int,
-    val imageAssetName: String
+    val imageAssetName: String,
+    // Stack-Zaehler fuer Duplikate (gleicher heroId + rarity). defaultValue MUSS zur
+    // Migration 4->5 in AppDatabase passen (ALTER TABLE ... DEFAULT 1).
+    @ColumnInfo(defaultValue = "1") val count: Int = 1
 )

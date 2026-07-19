@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -133,6 +134,19 @@ private fun CardTile(card: Card, onClick: () -> Unit) {
                 dotSize = 16.dp,
                 modifier = Modifier.align(Alignment.TopStart).padding(6.dp)
             )
+            // Stack-Badge (Karten-Stacking): Duplikate erhoehen count statt neue Zeilen zu erzeugen
+            if (card.count > 1) {
+                Text(
+                    text = "x${card.count}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(6.dp)
+                        .background(Color.Black.copy(alpha = 0.65f), RoundedCornerShape(6.dp))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

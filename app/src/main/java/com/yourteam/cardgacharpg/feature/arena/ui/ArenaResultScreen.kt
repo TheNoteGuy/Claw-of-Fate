@@ -39,6 +39,13 @@ fun ArenaResultScreen(
             "${if (result.trophyDelta >= 0) "+" else ""}${result.trophyDelta} 🏆",
             style = MaterialTheme.typography.titleLarge
         )
+        if (result.playerTotalUnits > 0) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "${result.playerSurvivors} von ${result.playerTotalUnits} Helden überlebt",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
         if (result.goldReward > 0) {
             Spacer(Modifier.height(4.dp))
             Text(

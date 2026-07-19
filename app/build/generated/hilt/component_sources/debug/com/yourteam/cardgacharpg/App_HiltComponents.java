@@ -6,6 +6,7 @@ import com.yourteam.cardgacharpg.feature.arena.ui.ArenaViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.arena.ui.HomeViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.battle.ui.BattleViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.battle.ui.FormationViewModel_HiltModules;
+import com.yourteam.cardgacharpg.feature.campaign.ui.CampaignBattleViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.campaign.ui.CampaignViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.collection.ui.CardDetailViewModel_HiltModules;
 import com.yourteam.cardgacharpg.feature.collection.ui.CollectionViewModel_HiltModules;
@@ -166,6 +167,7 @@ public final class App_HiltComponents {
           ViewModelCBuilderModule.class,
           ArenaViewModel_HiltModules.KeyModule.class,
           BattleViewModel_HiltModules.KeyModule.class,
+          CampaignBattleViewModel_HiltModules.KeyModule.class,
           CampaignViewModel_HiltModules.KeyModule.class,
           CardDetailViewModel_HiltModules.KeyModule.class,
           CollectionViewModel_HiltModules.KeyModule.class,
@@ -211,6 +213,7 @@ public final class App_HiltComponents {
       modules = {
           ArenaViewModel_HiltModules.BindsModule.class,
           BattleViewModel_HiltModules.BindsModule.class,
+          CampaignBattleViewModel_HiltModules.BindsModule.class,
           CampaignViewModel_HiltModules.BindsModule.class,
           CardDetailViewModel_HiltModules.BindsModule.class,
           CollectionViewModel_HiltModules.BindsModule.class,

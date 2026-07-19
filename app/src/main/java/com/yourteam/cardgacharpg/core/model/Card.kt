@@ -26,5 +26,8 @@ data class Card(
     val skill1Id: Int,
     val skill2Id: Int,
     // Referenz auf deine Katzen-PNGs je Rarity-Stufe, z.B. "hero_firecat_legendary"
-    val imageAssetName: String
+    val imageAssetName: String,
+    // Anzahl identischer Exemplare (heroId + rarity) auf diesem Stapel — siehe CardRepository.insertAll():
+    // Duplikate aus Gacha-Pulls erhoehen count, statt eine neue Zeile zu erzeugen.
+    val count: Int = 1
 )

@@ -1,7 +1,7 @@
 package com.yourteam.cardgacharpg.feature.arena.ui;
 
 import com.yourteam.cardgacharpg.feature.arena.domain.TrophyManager;
-import com.yourteam.cardgacharpg.feature.collection.data.CardRepository;
+import com.yourteam.cardgacharpg.feature.battle.data.FormationRepository;
 import com.yourteam.cardgacharpg.feature.gacha.data.CurrencyManager;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -25,33 +25,34 @@ import javax.inject.Provider;
     "cast"
 })
 public final class ArenaViewModel_Factory implements Factory<ArenaViewModel> {
-  private final Provider<CardRepository> cardRepositoryProvider;
+  private final Provider<FormationRepository> formationRepositoryProvider;
 
   private final Provider<TrophyManager> trophyManagerProvider;
 
   private final Provider<CurrencyManager> currencyManagerProvider;
 
-  public ArenaViewModel_Factory(Provider<CardRepository> cardRepositoryProvider,
+  public ArenaViewModel_Factory(Provider<FormationRepository> formationRepositoryProvider,
       Provider<TrophyManager> trophyManagerProvider,
       Provider<CurrencyManager> currencyManagerProvider) {
-    this.cardRepositoryProvider = cardRepositoryProvider;
+    this.formationRepositoryProvider = formationRepositoryProvider;
     this.trophyManagerProvider = trophyManagerProvider;
     this.currencyManagerProvider = currencyManagerProvider;
   }
 
   @Override
   public ArenaViewModel get() {
-    return newInstance(cardRepositoryProvider.get(), trophyManagerProvider.get(), currencyManagerProvider.get());
+    return newInstance(formationRepositoryProvider.get(), trophyManagerProvider.get(), currencyManagerProvider.get());
   }
 
-  public static ArenaViewModel_Factory create(Provider<CardRepository> cardRepositoryProvider,
+  public static ArenaViewModel_Factory create(
+      Provider<FormationRepository> formationRepositoryProvider,
       Provider<TrophyManager> trophyManagerProvider,
       Provider<CurrencyManager> currencyManagerProvider) {
-    return new ArenaViewModel_Factory(cardRepositoryProvider, trophyManagerProvider, currencyManagerProvider);
+    return new ArenaViewModel_Factory(formationRepositoryProvider, trophyManagerProvider, currencyManagerProvider);
   }
 
-  public static ArenaViewModel newInstance(CardRepository cardRepository,
+  public static ArenaViewModel newInstance(FormationRepository formationRepository,
       TrophyManager trophyManager, CurrencyManager currencyManager) {
-    return new ArenaViewModel(cardRepository, trophyManager, currencyManager);
+    return new ArenaViewModel(formationRepository, trophyManager, currencyManager);
   }
 }
