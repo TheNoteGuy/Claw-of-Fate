@@ -69,7 +69,8 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         composable(Routes.COLLECTION) {
             CollectionScreen(
                 onCardClick = { card -> navController.navigate(Routes.cardDetail(card.id)) },
-                onOpenGacha = { navController.navigate(Routes.GACHA) }
+                onOpenGacha = { navController.navigate(Routes.GACHA) },
+                onBack = { navController.popBackStack() }
             )
         }
 

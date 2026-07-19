@@ -2,7 +2,10 @@ package com.yourteam.cardgacharpg.feature.arena.ui
 
 // Owner: Person 5 (Robin) — Dashboard-Hub
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,11 +14,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yourteam.cardgacharpg.BuildConfig
 import com.yourteam.cardgacharpg.feature.arena.domain.TrophyManager
+
+// UI-Polish (Abgabe-Sprint) — Wald-Look zum Setting "Der Dunkle Wald":
+// dunkelgruener Vertikal-Verlauf als Hintergrund, halbtransparente gruene Karten,
+// goldener Kampagnen-Stern, Liga-Badge & Kampagnen-Karte auf gleicher Hoehe (IntrinsicSize).
+private val ForestTop = Color(0xFF14351C)
+private val ForestBottom = Color(0xFF07130A)
+private val ForestCard = Color(0xFF1C3B24)
+private val StarGold = Color(0xFFFFC107)
 
 @Composable
 fun HomeScreen(
@@ -37,7 +50,11 @@ fun HomeScreen(
         }
     }
 
-    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
+    Scaffold(
+        containerColor = Color.Transparent,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = Modifier.background(Brush.verticalGradient(listOf(ForestTop, ForestBottom)))
+    ) { padding ->
         if (uiState.isLoading) {
             Box(Modifier.fillMaxSize().padding(padding), Alignment.Center) { CircularProgressIndicator() }
             return@Scaffold
@@ -47,17 +64,29 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text(
+                "🌲 Claw of Fate",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Black,
+                color = Color.White
+            )
+
             CurrencyBar(gems = uiState.gems, gold = uiState.gold)
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                TrophyBadge(trophies = uiState.trophies, modifier = Modifier.weight(1f))
+            // IntrinsicSize.Min + fillMaxHeight: beide Karten immer exakt gleich hoch
+            Row(
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                TrophyBadge(trophies = uiState.trophies, modifier = Modifier.weight(1f).fillMaxHeight())
                 CampaignProgressCard(
                     starsTotal = uiState.campaignStarsTotal,
                     maxStars = uiState.campaignMaxStars,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).fillMaxHeight()
                 )
             }
 
@@ -84,9 +113,13 @@ fun HomeScreen(
             // im Release/Abgabe-Build (assembleRelease) verschwinden beide Buttons.
             if (BuildConfig.DEBUG) {
                 TextButton(onClick = viewModel::skipCooldownAndClaim, modifier = Modifier.fillMaxWidth()) {
-                    Text("⏭ Cooldown überspringen (Debug)")
+                    Text("⏭ Cooldown überspringen (Debug)", color = Color.White.copy(alpha = 0.7f))
                 }
-                OutlinedButton(onClick = viewModel::fakeBattle, modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = viewModel::fakeBattle,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White.copy(alpha = 0.7f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("🎲 Fake-Kampf (Trophy-Test, Debug)")
                 }
             }
@@ -96,7 +129,10 @@ fun HomeScreen(
 
 @Composable
 private fun CurrencyBar(gems: Int, gold: Int) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = ForestCard)
+    ) {
         Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
             CurrencyItem(icon = "💎", label = "Gems", value = gems)
             CurrencyItem(icon = "🪙", label = "Gold", value = gold)
@@ -109,23 +145,44 @@ private fun CurrencyItem(icon: String, label: String, value: Int) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = icon, style = MaterialTheme.typography.titleLarge)
         Column {
-            Text(text = value.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text(text = label, style = MaterialTheme.typography.labelMedium)
+            Text(
+                text = value.toString(),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(text = label, style = MaterialTheme.typography.labelMedium, color = Color(0xFF9CC9A3))
         }
     }
 }
 
 @Composable
 private fun TrophyBadge(trophies: Int, modifier: Modifier = Modifier) {
-    Card(modifier = modifier) {
+    val league = TrophyManager.leagueFor(trophies)
+    // Liga-Farbe: Bronze/Silber/Gold — mehr Farbcodierung im Screen
+    val leagueColor = when (league.displayName) {
+        "Gold" -> StarGold
+        "Silber" -> Color(0xFFB8C4CE)
+        else -> Color(0xFFCD7F32)
+    }
+    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = ForestCard)) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "🏆 $trophies", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Text(
-                text = TrophyManager.leagueFor(trophies).displayName + "-Liga",
-                style = MaterialTheme.typography.labelMedium
+                text = "🏆 $trophies",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = league.displayName + "-Liga",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = leagueColor
             )
         }
     }
@@ -133,23 +190,35 @@ private fun TrophyBadge(trophies: Int, modifier: Modifier = Modifier) {
 
 @Composable
 private fun CampaignProgressCard(starsTotal: Int, maxStars: Int, modifier: Modifier = Modifier) {
-    Card(modifier = modifier) {
+    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = ForestCard)) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "$starsTotal / $maxStars ★",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "$starsTotal / $maxStars ",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = "★",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = StarGold
+                )
+            }
             Spacer(Modifier.height(4.dp))
             LinearProgressIndicator(
                 progress = { if (maxStars > 0) starsTotal.toFloat() / maxStars else 0f },
+                color = StarGold,
+                trackColor = Color.White.copy(alpha = 0.15f),
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(4.dp))
-            Text(text = "Kampagne", style = MaterialTheme.typography.labelMedium)
+            Text(text = "Kampagne", style = MaterialTheme.typography.labelMedium, color = Color(0xFF9CC9A3))
         }
     }
 }
@@ -161,11 +230,16 @@ private fun FormationPreviewCard(
     cardCount: Int,
     onClick: () -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = ForestCard)
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Aktive Formation ($activeFormationSize/6)",
-                style = MaterialTheme.typography.titleMedium
+                text = "⚔ Aktive Formation ($activeFormationSize/6)",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
             Spacer(Modifier.height(8.dp))
 
@@ -179,7 +253,8 @@ private fun FormationPreviewCard(
             Spacer(Modifier.height(8.dp))
             Text(
                 text = if (cardCount == 0) "Noch keine Karten — geh zum Gacha!" else "$cardCount Karten in deiner Sammlung",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = Color(0xFF9CC9A3)
             )
             TextButton(onClick = onClick, modifier = Modifier.align(Alignment.End)) {
                 Text("Formation bearbeiten")
@@ -205,7 +280,7 @@ private fun FormationSlot(filled: Boolean, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.height(32.dp),
         tonalElevation = if (filled) 4.dp else 0.dp,
-        color = if (filled) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+        color = if (filled) Color(0xFF3E7C4A) else Color.White.copy(alpha = 0.08f)
     ) {
         if (filled) {
             Box(contentAlignment = Alignment.Center) {
@@ -224,14 +299,40 @@ private fun NavigationHub(
     onOpenArena: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(text = "Bereiche", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = "Bereiche",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+        // Farbcodierung passend zu den Ziel-Screens: Collection = Blau, Gacha = Violett,
+        // Kampagne = Waldgruen, Arena = Hauptaktion
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onOpenCollection, modifier = Modifier.weight(1f)) { Text("Collection") }
-            OutlinedButton(onClick = onOpenGacha, modifier = Modifier.weight(1f)) { Text("Gacha") }
+            Button(
+                onClick = onOpenCollection,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C4A7C)),
+                modifier = Modifier.weight(1f)
+            ) { Text("📚 Collection") }
+            Button(
+                onClick = onOpenGacha,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7B2CBF)),
+                modifier = Modifier.weight(1f)
+            ) { Text("✨ Gacha") }
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onOpenCampaign, modifier = Modifier.weight(1f)) { Text("Kampagne") }
-            Button(onClick = onOpenArena, modifier = Modifier.weight(1f)) { Text("Arena") }
+            Button(
+                onClick = onOpenCampaign,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3E7C4A)),
+                modifier = Modifier.weight(1f)
+            ) { Text("🗺 Kampagne") }
+            Button(
+                onClick = onOpenArena,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = StarGold,
+                    contentColor = Color(0xFF3A2A00)
+                ),
+                modifier = Modifier.weight(1f)
+            ) { Text("⚔ Arena", fontWeight = FontWeight.Bold) }
         }
     }
 }

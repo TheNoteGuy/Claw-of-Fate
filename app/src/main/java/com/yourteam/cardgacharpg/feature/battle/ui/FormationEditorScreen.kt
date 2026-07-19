@@ -209,19 +209,28 @@ private fun FormationSlotTile(
 
 @Composable
 private fun AvailableCardTile(card: Card, enabled: Boolean, onClick: () -> Unit) {
-    Box(
+    // UI-Polish: zeigt jetzt das Katzen-Asset (CardImage, Person 1) statt nur Text —
+    // man erkennt sofort, WEN man in die Formation setzt.
+    Column(
         modifier = Modifier
             .width(90.dp)
-            .aspectRatio(0.75f)
             .clip(RoundedCornerShape(10.dp))
             .background(card.rarity.color().copy(alpha = if (enabled) 0.2f else 0.08f))
             .border(1.dp, card.rarity.color(), RoundedCornerShape(10.dp))
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(6.dp)
+            .padding(6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column {
-            Text(card.name, style = MaterialTheme.typography.labelMedium, maxLines = 1, fontWeight = FontWeight.SemiBold)
-            Text("${card.role.name} · Lv.${card.level}", style = MaterialTheme.typography.labelSmall)
-        }
+        CardImage(
+            imageAssetName = card.imageAssetName,
+            contentDescription = card.name,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(6.dp))
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(card.name, style = MaterialTheme.typography.labelMedium, maxLines = 1, fontWeight = FontWeight.SemiBold)
+        Text("${card.role.name} · Lv.${card.level}", style = MaterialTheme.typography.labelSmall)
     }
 }
