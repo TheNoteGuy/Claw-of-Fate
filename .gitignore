@@ -55,3 +55,4 @@ Thumbs.db
 # Android Studio
 *.log
 proguard-mapping.txt
+app/build/
