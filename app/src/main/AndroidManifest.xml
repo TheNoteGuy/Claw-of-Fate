@@ -4,7 +4,7 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/claw_of_fate_app_icon"
         android:label="Claw of Fate"
         android:theme="@style/Theme.CardGachaRPG">
 
